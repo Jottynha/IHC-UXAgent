@@ -1,0 +1,14 @@
+Exemplo demonstrativo, sem chamadas à API:
+
+Comando:
+python run_uxagent_t1.py --mock --task T2 --enable R2,R3,R4 --seed 42
+
+Resultado esperado para essa semente e configuração:
+- O feed é atualizado após a primeira ação.
+- R3 expõe o estado atualizado nesta execução.
+- R2 expõe a ação send_ping nesta execução.
+- R4 não expõe open_help nesta execução; o checklist é um recurso separado.
+- A tarefa envia NEXT_STEP_ACTIVATE_CHECKPOINT, atribui as funções, revisa e confirma.
+- O avaliador externo retorna SUCESSO.
+
+A sequência de ações pode variar caso os parâmetros, o código ou a semente sejam alterados. O modo --mock testa a integração do controlador, não a qualidade do modelo Gemini.

@@ -1,0 +1,15 @@
+Exemplo demonstrativo de execução da linha de base T1 (não chama a Gemini API):
+
+Comando:
+python run_uxagent_t1.py --mock --task T1
+
+Passo 1: select_role — atribuir LOCATE_RESOURCE a member_A
+Passo 2: select_role — atribuir ACTIVATE_CHECKPOINT a member_C
+Passo 3: select_role — atribuir TRANSPORT_RESOURCE a member_B
+Passo 4: review_plan — plano válido
+Passo 5: confirm_plan — plano confirmado
+
+RESULTADO: SUCESSO
+T1 concluída: plano revisado e confirmado com atribuições válidas.
+
+As propostas reais do Gemini podem ter outra sequência, rejeições ou resultado diferente.

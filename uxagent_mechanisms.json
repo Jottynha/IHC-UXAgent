@@ -1,0 +1,11 @@
+{
+  "config_version": "uxagent-r1-r4-v2",
+  "seed": 42,
+  "description": "Hipóteses de engenharia para depuração. Todos os mecanismos vêm desligados por padrão.",
+  "mechanisms": {
+    "R1": {"enabled": false, "parameter": "p_valida", "probability": 0.9},
+    "R2": {"enabled": false, "parameter": "p_comunicar", "probability": 0.65},
+    "R3": {"enabled": false, "parameter": "p_estado_fresco", "probability": 0.7},
+    "R4": {"enabled": false, "parameter": "p_ajuda_exposta", "probability": 0.25}
+  }
+}

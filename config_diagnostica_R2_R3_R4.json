@@ -1,0 +1,11 @@
+{
+  "config_version": "uxagent-r1-r4-diagnostic-v1",
+  "seed": 42,
+  "description": "Configuração extrema apenas para forçar caminhos de teste; não usar como calibração nem como parâmetro humano.",
+  "mechanisms": {
+    "R1": {"enabled": false, "parameter": "p_valida", "probability": 0.9},
+    "R2": {"enabled": false, "parameter": "p_comunicar", "probability": 1.0},
+    "R3": {"enabled": false, "parameter": "p_estado_fresco", "probability": 0.0},
+    "R4": {"enabled": false, "parameter": "p_ajuda_exposta", "probability": 1.0}
+  }
+}

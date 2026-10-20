@@ -1,0 +1,422 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "UXAgent interaction event",
+  "description": "Envelope for one human or synthetic event. synthetic marks session/data origin; actor marks who produced the event.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "sid",
+    "tid",
+    "cond",
+    "actor",
+    "synthetic",
+    "cfg_ver",
+    "ui_ver",
+    "step",
+    "event",
+    "ts_sys",
+    "tech_fail"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "sid": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tid": {
+      "type": "string",
+      "enum": [
+        "T1",
+        "T2",
+        "T3",
+        "T4"
+      ]
+    },
+    "cond": {
+      "type": "string",
+      "enum": [
+        "calibration",
+        "validation",
+        "human_profile",
+        "human_comparator",
+        "rule_control"
+      ]
+    },
+    "actor": {
+      "type": "string",
+      "enum": [
+        "human",
+        "llm",
+        "controller",
+        "evaluator"
+      ]
+    },
+    "synthetic": {
+      "type": "boolean"
+    },
+    "cfg_ver": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ui_ver": {
+      "type": "string",
+      "minLength": 1
+    },
+    "llm_model": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "llm_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "prompt_ver": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "step": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "event": {
+      "type": "string",
+      "enum": [
+        "task_start",
+        "observation_emitted",
+        "task_end",
+        "action_proposed",
+        "action_rejected",
+        "action_executed",
+        "state_changed",
+        "support_opened",
+        "error_recorded",
+        "plan_submitted",
+        "task_evaluated",
+        "task_interrupted",
+        "technical_failure"
+      ]
+    },
+    "ts_sys": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "obs_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "state_pre": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "state_post": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "act_prop": {
+      "$ref": "#/$defs/actionOrNull"
+    },
+    "act_exec": {
+      "$ref": "#/$defs/actionOrNull"
+    },
+    "reject": {
+      "$ref": "#/$defs/rejectionOrNull"
+    },
+    "support": {
+      "$ref": "#/$defs/supportOrNull"
+    },
+    "error": {
+      "$ref": "#/$defs/errorOrNull"
+    },
+    "opp_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "outcome": {
+      "$ref": "#/$defs/outcomeOrNull"
+    },
+    "tech_fail": {
+      "type": "boolean"
+    },
+    "tech_fail_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "note": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "actor": {
+            "const": "human"
+          }
+        },
+        "required": [
+          "actor"
+        ]
+      },
+      "then": {
+        "properties": {
+          "synthetic": {
+            "const": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "actor": {
+            "const": "llm"
+          }
+        },
+        "required": [
+          "actor"
+        ]
+      },
+      "then": {
+        "properties": {
+          "synthetic": {
+            "const": true
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "tech_fail": {
+            "const": true
+          }
+        },
+        "required": [
+          "tech_fail"
+        ]
+      },
+      "then": {
+        "properties": {
+          "event": {
+            "enum": [
+              "technical_failure",
+              "task_interrupted"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "arguments"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": [
+            "select_role",
+            "set_step_order",
+            "send_ping",
+            "open_checklist",
+            "open_help",
+            "refresh_feed",
+            "review_plan",
+            "confirm_plan"
+          ]
+        },
+        "arguments": {
+          "type": "object"
+        }
+      }
+    },
+    "actionOrNull": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/action"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "rejection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reason"
+      ],
+      "properties": {
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rule_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "rejectionOrNull": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/rejection"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "support": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resource",
+        "opened"
+      ],
+      "properties": {
+        "resource": {
+          "type": "string",
+          "enum": [
+            "checklist",
+            "contextual_help"
+          ]
+        },
+        "opened": {
+          "type": "boolean"
+        },
+        "topic": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "supportOrNull": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/support"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "category",
+        "opp_id"
+      ],
+      "properties": {
+        "category": {
+          "type": "string",
+          "enum": [
+            "operational_slip",
+            "invalid_plan",
+            "stale_state_confirmation",
+            "required_ping_missing",
+            "role_missing_or_duplicated",
+            "skill_constraint_violation",
+            "dependency_violation",
+            "invalid_action",
+            "other"
+          ]
+        },
+        "opp_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "rule_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "errorOrNull": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/error"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "success",
+            "failure",
+            "unknown",
+            "interrupted"
+          ]
+        },
+        "success": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "outcomeOrNull": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/outcome"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  }
+}

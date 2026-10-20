@@ -1,0 +1,33 @@
+Resumo dos logs UXAgent
+Pasta: /home/joao/Downloads/uxagent_gemini_t1_r1_r4_v2/uxagent_gemini_t1_r1_r4/logs
+Sessões resumidas: 2
+
+### t2-20261017T143207Z-870dd1.jsonl
+- **Sessão:** t2-20261017T143207Z-870dd1
+- **Tarefa/condição:** T2 / calibration
+- **Modelo:** sem modelo registrado (pode ser --mock ou o log não contém modelo)
+- **Eventos válidos:** 28
+- **Configuração:** versão=uxagent-r1-r4-diagnostic-v1; seed=42
+- **Mecanismos configurados:** R1=OFF (p_valida=0.9); R2=ON (p_comunicar=1.0); R3=ON (p_estado_fresco=0.0); R4=ON (p_ajuda_exposta=1.0)
+- **Resultado externo:** success; success=True; motivo: T2 concluída: feed atualizado, comunicação registrada e plano válido revisado e confirmado.
+- **Contagem de eventos:** action_executed=6, action_proposed=6, observation_emitted=6, state_changed=7, task_end=1, task_evaluated=1, task_start=1
+- **Propostas processadas:** 6; **ações executadas:** 6; **rejeições:** 0; **eventos de erro:** 0; **falhas técnicas:** 0
+- **Sequência executada:** select_role {"member": "member_C", "role": "ACTIVATE_CHECKPOINT"} → refresh_feed → send_ping {"code": "NEXT_STEP_ACTIVATE_CHECKPOINT"} → select_role {"member": "member_B", "role": "TRANSPORT_RESOURCE"} → review_plan → confirm_plan
+- **Exposição observada:** R2=disponível: 5 observações; R4=disponível: 5 observações
+- **Feed:** observações desatualizadas=1/6; revisão final visível/real=1/1
+- **Privacidade:** este resumo omite estado completo, prompts e notas brutas do log; não inclui chave de API.
+
+### t2-20261017T143214Z-21acbe.jsonl
+- **Sessão:** t2-20261017T143214Z-21acbe
+- **Tarefa/condição:** T2 / calibration
+- **Modelo:** gemini-3.5-flash-lite
+- **Eventos válidos:** 29
+- **Configuração:** versão=uxagent-r1-r4-diagnostic-v1; seed=42
+- **Mecanismos configurados:** R1=OFF (p_valida=0.9); R2=ON (p_comunicar=1.0); R3=ON (p_estado_fresco=0.0); R4=ON (p_ajuda_exposta=1.0)
+- **Resultado externo:** unknown; success=None; motivo: Falha técnica durante o protótipo.
+- **Contagem de eventos:** action_executed=6, action_proposed=7, observation_emitted=7, state_changed=7, task_start=1, technical_failure=1
+- **Propostas processadas:** 7; **ações executadas:** 6; **rejeições:** 0; **eventos de erro:** 0; **falhas técnicas:** 1
+- **Sequência executada:** refresh_feed → refresh_feed → send_ping {"code": "NEXT_STEP_ACTIVATE_CHECKPOINT"} → select_role {"member": "member_C", "role": "ACTIVATE_CHECKPOINT"} → select_role {"member": "member_B", "role": "TRANSPORT_RESOURCE"} → review_plan
+- **Exposição observada:** R2=disponível: 6 observações; R4=disponível: 6 observações
+- **Feed:** observações desatualizadas=1/7; revisão final visível/real=1/1
+- **Privacidade:** este resumo omite estado completo, prompts e notas brutas do log; não inclui chave de API.
