@@ -39,8 +39,16 @@ python run_uxagent_t1.py --mock --task T2
 Executar a suíte completa:
 
 ```bash
-python -m unittest discover -s tests -v
+python3 -m unittest discover -s tests -v
 ```
+
+O cálculo auditável das métricas mínimas está em `metrics.py`:
+
+```python
+from metrics import summarize_session, summarize_sessions
+```
+
+`summary["success"]` é `None` quando a sessão não permite avaliação independente, por exemplo após falha técnica. Denominadores nulos também retornam `None`; resultados sintéticos não são convertidos em medidas humanas.
 
 Resumir logs sem despejar estados e notas brutas (copie o resumo para compartilhar, nunca a chave API):
 

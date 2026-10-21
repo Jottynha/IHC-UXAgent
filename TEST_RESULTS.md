@@ -10,7 +10,7 @@ Comando executado:
 python -m unittest discover -s tests -v
 ```
 
-**Resultado: 54 testes aprovados.** `python -m compileall -q .` também concluiu sem erro.
+**Resultado: 57 testes aprovados.** `python -m compileall -q .` também concluiu sem erro.
 
 A suíte cobre os schemas de ações e eventos; operações do controlador; probabilidade-limite de cada mecanismo (0 e 1); T1 e T2 com política mock; injeção R1 registrada como diferença entre ação proposta e executada; falha esperada quando R2 remove a oportunidade obrigatória de ping; e recuperação de feed obsoleto de R3 com `refresh_feed`.
 
