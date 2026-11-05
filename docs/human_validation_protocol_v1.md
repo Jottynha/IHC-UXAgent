@@ -3,6 +3,14 @@
 Este protocolo é um plano futuro; nenhuma coleta humana é realizada pelo
 repositório atual.
 
+## Status de prontidão
+
+- Protocolo documentado: **sim**.
+- Protótipo técnico e logs sintéticos: **sim**.
+- Aprovação institucional: **pendente**.
+- Consentimento, recrutamento e coleta: **bloqueados até aprovação**.
+- T3/T4: reservadas para validação independente; não calibram T1/T2.
+
 ## Perfil e comparador
 
 - Participantes adultos (18+), com familiaridade digital geral.

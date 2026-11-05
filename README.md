@@ -15,7 +15,7 @@ não deve ser usado para inferir comportamento real.
 - Fachada `UXAgentSession` pronta para uma futura interface web/desktop.
 - T3 e T4 implementadas em versão independente para validação reservada.
 - Interface web local de baixa fidelidade implementada; design visual final ainda não implementado.
-- Base técnica congelada para reprodução em [`docs/freeze_manifest_v2.json`](docs/freeze_manifest_v2.json).
+- Base técnica congelada para reprodução em [`docs/freeze_manifest_v4.json`](docs/freeze_manifest_v4.json).
 
 ## Estrutura
 
