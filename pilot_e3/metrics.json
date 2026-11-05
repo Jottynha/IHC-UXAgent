@@ -1,0 +1,114 @@
+{
+  "metric_definitions": {
+    "S": "sucesso externo por sessão (0/1)",
+    "R": "recuperação: sessão bem-sucedida após erro funcional; nulo quando não houve oportunidade",
+    "E": "número de eventos com erro funcional",
+    "A": "ações executadas",
+    "help_used": "eventos support_opened"
+  },
+  "klm_reference_actions": {
+    "T1": 5,
+    "T2": 6
+  },
+  "sessions": [
+    {
+      "case": "t1-seed-42",
+      "task": "T1",
+      "success": true,
+      "S": 1,
+      "R": null,
+      "E": 0,
+      "A": 5,
+      "help_used": 0,
+      "klm_actions": 5,
+      "delta_actions_vs_klm": 0,
+      "technical_failures": 0
+    },
+    {
+      "case": "t1-seed-43",
+      "task": "T1",
+      "success": true,
+      "S": 1,
+      "R": null,
+      "E": 0,
+      "A": 5,
+      "help_used": 0,
+      "klm_actions": 5,
+      "delta_actions_vs_klm": 0,
+      "technical_failures": 0
+    },
+    {
+      "case": "t1-seed-44",
+      "task": "T1",
+      "success": true,
+      "S": 1,
+      "R": null,
+      "E": 0,
+      "A": 5,
+      "help_used": 0,
+      "klm_actions": 5,
+      "delta_actions_vs_klm": 0,
+      "technical_failures": 0
+    },
+    {
+      "case": "t2-seed-42",
+      "task": "T2",
+      "success": true,
+      "S": 1,
+      "R": null,
+      "E": 0,
+      "A": 5,
+      "help_used": 0,
+      "klm_actions": 6,
+      "delta_actions_vs_klm": -1,
+      "technical_failures": 0
+    },
+    {
+      "case": "t2-seed-43",
+      "task": "T2",
+      "success": true,
+      "S": 1,
+      "R": null,
+      "E": 0,
+      "A": 5,
+      "help_used": 0,
+      "klm_actions": 6,
+      "delta_actions_vs_klm": -1,
+      "technical_failures": 0
+    },
+    {
+      "case": "t2-seed-44",
+      "task": "T2",
+      "success": true,
+      "S": 1,
+      "R": null,
+      "E": 0,
+      "A": 5,
+      "help_used": 0,
+      "klm_actions": 6,
+      "delta_actions_vs_klm": -1,
+      "technical_failures": 0
+    }
+  ],
+  "aggregate": {
+    "T1": {
+      "n": 3,
+      "S_rate": 1.0,
+      "R_rate": null,
+      "mean_E": 0.0,
+      "mean_A": 5.0,
+      "mean_help": 0.0,
+      "mean_delta_actions_vs_klm": 0.0
+    },
+    "T2": {
+      "n": 3,
+      "S_rate": 1.0,
+      "R_rate": null,
+      "mean_E": 0.0,
+      "mean_A": 5.0,
+      "mean_help": 0.0,
+      "mean_delta_actions_vs_klm": -1.0
+    }
+  },
+  "caveat": "Piloto sintético com política mock; não é evidência humana nem estima tempo KLM."
+}

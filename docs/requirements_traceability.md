@@ -24,6 +24,11 @@ com participantes.
 | Executar T4 com integração de painéis | `environment.py`, `controller.py`, `uxagent_session.py` | `tests/test_reserved_tasks.py` |
 | Formalizar HTA, CTT, GOMS/KLM e MoLIC | `docs/ihc_design_artifacts_v1.md` | inspeção documental |
 | Definir protocolo, tolerâncias e ética | `docs/human_validation_protocol_v1.md` | revisão antes de coleta |
+| Auditar entregáveis e rubrica P3 | `docs/uxagent_p3_report.tex` | auditoria documental; lacunas explicitadas |
+| Formalizar CTT, MoLIC e matriz MAC | `docs/design_specification_e1.md` | caderno E1 complementar |
+| Produzir pacote E3 reproduzível | `pilot_e3.zip`, `tools/run_pilot.py` | seis sessões mock e duas sessões Gemini rastreadas |
+| Preparar demonstração | `docs/demo_script_3_to_5_min.md` | roteiro reproduzível; vídeo ainda não gravado |
+| Preparar aprovação institucional | `docs/institutional_review_checklist.md` | checklist; aprovação ainda pendente |
 
 ## Evidência Gemini em 2026-11-05
 
@@ -42,7 +47,7 @@ medem qualidade humana, usabilidade ou desempenho geral do modelo.
 - T3/T4 têm implementação independente e continuam reservadas para validação;
   seus resultados não calibram T1/T2.
 - Interface, prompt, configuração, schemas e modelo estão congelados para a
-  base técnica em [`freeze_manifest_v4.json`](freeze_manifest_v4.json).
+  base técnica em [`freeze_manifest_v6.json`](freeze_manifest_v6.json).
 - O congelamento técnico não autoriza estudo humano nem transforma resultados
   sintéticos em evidência empírica.
 - O protocolo, a amostra operacional, as tolerâncias e a ética estão

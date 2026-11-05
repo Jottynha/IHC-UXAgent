@@ -1,0 +1,17 @@
+UXAgent â€” T1: Atribuir as trÃªs funÃ§Ãµes complementares a trÃªs integrantes disponÃ­veis.
+Modo: mock (sem API/custo)
+Modelo: mock-policy
+SessÃ£o: t1-20261105T212012Z-b3db02
+Mecanismos ativos: nenhum (linha de base)
+ParÃ¢metros: {"config_version": "uxagent-r1-r4-v2", "seed": 42, "mechanisms": {"R1": {"enabled": false, "parameter": "p_valida", "probability": 0.9}, "R2": {"enabled": false, "parameter": "p_comunicar", "probability": 0.65}, "R3": {"enabled": false, "parameter": "p_estado_fresco", "probability": 0.7}, "R4": {"enabled": false, "parameter": "p_ajuda_exposta", "probability": 0.25}}}
+
+Passo 1: select_role â†’ {'member': 'member_A', 'role': 'LOCATE_RESOURCE'} â€” AtribuiÃ§Ã£o registrada: member_A â†’ LOCATE_RESOURCE.
+Passo 2: select_role â†’ {'member': 'member_C', 'role': 'ACTIVATE_CHECKPOINT'} â€” AtribuiÃ§Ã£o registrada: member_C â†’ ACTIVATE_CHECKPOINT.
+Passo 3: select_role â†’ {'member': 'member_B', 'role': 'TRANSPORT_RESOURCE'} â€” AtribuiÃ§Ã£o registrada: member_B â†’ TRANSPORT_RESOURCE.
+Passo 4: review_plan â†’ {} â€” Plano vÃ¡lido: funÃ§Ãµes cobertas, integrantes disponÃ­veis e dependÃªncias respeitadas.
+Passo 5: confirm_plan â†’ {} â€” Plano confirmado. O avaliador externo vai verificar o estado final.
+
+RESULTADO: SUCESSO
+T1 concluÃ­da: plano revisado e confirmado com atribuiÃ§Ãµes vÃ¡lidas.
+Propostas processadas: 5; aÃ§Ãµes aceitas/executadas: 5
+Log JSONL: C:\Users\joao.silva\Documents\GitHub\IHC-UXAgent\pilot_e3\t1-seed-42\logs\t1-20261105T212012Z-b3db02.jsonl

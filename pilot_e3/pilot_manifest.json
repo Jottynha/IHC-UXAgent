@@ -1,0 +1,113 @@
+{
+  "package_version": "e3-pilot-v1",
+  "generated_at": "2026-11-05T21:20:16Z",
+  "synthetic": true,
+  "tasks": [
+    "T1",
+    "T2"
+  ],
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "cases": [
+    {
+      "case": "t1-seed-42",
+      "task": "T1",
+      "seed": 42,
+      "return_code": 0,
+      "events": 23,
+      "log": "t1-seed-42\\events.jsonl",
+      "outcome": {
+        "status": "success",
+        "success": true,
+        "reason": "T1 concluída: plano revisado e confirmado com atribuições válidas."
+      },
+      "actions_executed": 5,
+      "supports_used": 0,
+      "errors": 0
+    },
+    {
+      "case": "t1-seed-43",
+      "task": "T1",
+      "seed": 43,
+      "return_code": 0,
+      "events": 23,
+      "log": "t1-seed-43\\events.jsonl",
+      "outcome": {
+        "status": "success",
+        "success": true,
+        "reason": "T1 concluída: plano revisado e confirmado com atribuições válidas."
+      },
+      "actions_executed": 5,
+      "supports_used": 0,
+      "errors": 0
+    },
+    {
+      "case": "t1-seed-44",
+      "task": "T1",
+      "seed": 44,
+      "return_code": 0,
+      "events": 23,
+      "log": "t1-seed-44\\events.jsonl",
+      "outcome": {
+        "status": "success",
+        "success": true,
+        "reason": "T1 concluída: plano revisado e confirmado com atribuições válidas."
+      },
+      "actions_executed": 5,
+      "supports_used": 0,
+      "errors": 0
+    },
+    {
+      "case": "t2-seed-42",
+      "task": "T2",
+      "seed": 42,
+      "return_code": 0,
+      "events": 24,
+      "log": "t2-seed-42\\events.jsonl",
+      "outcome": {
+        "status": "success",
+        "success": true,
+        "reason": "T2 concluída: feed atualizado, comunicação registrada e plano válido revisado e confirmado."
+      },
+      "actions_executed": 5,
+      "supports_used": 0,
+      "errors": 0
+    },
+    {
+      "case": "t2-seed-43",
+      "task": "T2",
+      "seed": 43,
+      "return_code": 0,
+      "events": 24,
+      "log": "t2-seed-43\\events.jsonl",
+      "outcome": {
+        "status": "success",
+        "success": true,
+        "reason": "T2 concluída: feed atualizado, comunicação registrada e plano válido revisado e confirmado."
+      },
+      "actions_executed": 5,
+      "supports_used": 0,
+      "errors": 0
+    },
+    {
+      "case": "t2-seed-44",
+      "task": "T2",
+      "seed": 44,
+      "return_code": 0,
+      "events": 24,
+      "log": "t2-seed-44\\events.jsonl",
+      "outcome": {
+        "status": "success",
+        "success": true,
+        "reason": "T2 concluída: feed atualizado, comunicação registrada e plano válido revisado e confirmado."
+      },
+      "actions_executed": 5,
+      "supports_used": 0,
+      "errors": 0
+    }
+  ],
+  "note": "Mock policy pilot. No LLM prompt is sent in this run; real Gemini traces are captured separately via UXAGENT_TRACE_DIR."
+}

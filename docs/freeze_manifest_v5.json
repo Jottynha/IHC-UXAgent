@@ -1,0 +1,29 @@
+{
+  "freeze_id": "uxagent-technical-freeze-v5",
+  "frozen_at": "2026-11-05",
+  "status": "pilot-e3-and-reporting-package-frozen",
+  "scope": "instrumented prototype, synthetic calibration pilot, Gemini trace sample, E3 package and IEEE report source",
+  "supersedes": "freeze_manifest_v4.json",
+  "human_validation": {
+    "status": "blocked",
+    "reason": "institutional approval, consent and recruitment are not available"
+  },
+  "evidence": {
+    "automated_tests": 70,
+    "mock_sessions": 6,
+    "real_gemini_sessions": 2,
+    "gemini_trace_files": 30,
+    "e3_package_sha256": "ae472ada3fd1295be62b6512e4aa7a47d701ef96b88984e3fc339f23db527ffe"
+  },
+  "frozen_files_sha256": {
+    "gemini_client.py": "07e3829070d618116c80311f0220f11c49d2864f2cb9dbb1afa4c3a3a4c0de10",
+    "tools/run_pilot.py": "f56682aad624c75a57299b1d3270ffdcae63260cf8025ad0df1eec95f89bb641",
+    "tools/analyze_pilot.py": "aada890ab85d555001f6d02d4d8826905dbeae65d33241ecc560d756acd886bd",
+    "docs/e3_field_dictionary.md": "a486bdc029db6f4b315a99c0e716f45823409c15f8671d12d70e36e34cca1a87",
+    "docs/demo_script_3_to_5_min.md": "4986e65465fc248ab6cea43c462fc7a04c1e093ccdf63aa6c8f3abfadef280b0",
+    "docs/institutional_review_checklist.md": "bac5d2671181cc072dd709831bb49194d99ab3a39c6455f79640c01e87ef05d2",
+    "docs/uxagent_p3_report.tex": "48a582e1e3221f016d2608d809f658049dca50b34f9ad52df4959bc4672a2fcb",
+    "README.md": "716b8214b51225109c3545f779ac4b380c512eae0d16f8c4f011e48f031f98f9",
+    "pilot_e3.zip": "ae472ada3fd1295be62b6512e4aa7a47d701ef96b88984e3fc339f23db527ffe"
+  }
+}

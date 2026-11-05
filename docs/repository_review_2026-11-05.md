@@ -68,6 +68,13 @@ Foi congelada a base técnica atual para reprodutibilidade, conforme
 Esses resultados verificam integração e robustez técnica; não são evidência de
 usabilidade nem de alinhamento com participantes humanos.
 
+A auditoria específica do enunciado P3 está em
+[`uxagent_p3_report.tex`](uxagent_p3_report.tex). Ela registra como parciais
+a formalização CTT/MoLIC/MAC, o pacote E3, a comparação KLM e o PDF IEEE.
+O pacote E3 técnico foi produzido em `pilot_e3.zip`, com hash registrado no
+manifesto [`freeze_manifest_v6.json`](freeze_manifest_v6.json). A compilação
+PDF não foi executada porque o ambiente não possui uma distribuição LaTeX.
+
 ## Próximas ações obrigatórias
 
 1. Auditar os artefatos formais contra a interface concreta em um piloto técnico.

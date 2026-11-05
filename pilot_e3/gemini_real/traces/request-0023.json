@@ -1,0 +1,120 @@
+{
+  "trace_version": "1.0",
+  "sequence": 23,
+  "timestamp": "2026-11-05T21:24:51.084Z",
+  "model": "gemini-3.5-flash-lite",
+  "prompt_version": "uxagent-action-prompt-v4",
+  "context": {
+    "task_id": "T2",
+    "task": "T2 — Revisar o plano após uma atualização do feed, atualizar o estado observado, comunicar a próxima etapa se a ação de ping estiver disponível, atribuir todas as funções, revisar e confirmar o plano.",
+    "state": {
+      "task_id": "T2",
+      "objective": "Revisar o plano após uma atualização do feed, atualizar o estado observado, comunicar a próxima etapa se a ação de ping estiver disponível, atribuir todas as funções, revisar e confirmar o plano.",
+      "members": {
+        "member_A": {
+          "available": true,
+          "capabilities": [
+            "LOCATE_RESOURCE",
+            "ACTIVATE_CHECKPOINT"
+          ]
+        },
+        "member_B": {
+          "available": true,
+          "capabilities": [
+            "TRANSPORT_RESOURCE"
+          ]
+        },
+        "member_C": {
+          "available": true,
+          "capabilities": [
+            "ACTIVATE_CHECKPOINT"
+          ]
+        }
+      },
+      "assignments": {
+        "member_A": "ACTIVATE_CHECKPOINT",
+        "member_B": "TRANSPORT_RESOURCE"
+      },
+      "required_roles": [
+        "LOCATE_RESOURCE",
+        "ACTIVATE_CHECKPOINT",
+        "TRANSPORT_RESOURCE"
+      ],
+      "step_order": [
+        "LOCATE_RESOURCE",
+        "ACTIVATE_CHECKPOINT",
+        "TRANSPORT_RESOURCE"
+      ],
+      "reviewed": false,
+      "plan_confirmed": false,
+      "checklist_open": false,
+      "help_topic": null,
+      "feed_refreshes": 1,
+      "pings": [
+        "NEXT_STEP_ACTIVATE_CHECKPOINT"
+      ],
+      "actions_executed": 4,
+      "actions_proposed": 22,
+      "feedback": "Feed atualizado; a observação agora reflete o último estado recebido.",
+      "rules": [
+        "Cada uma das três funções deve ser atribuída exatamente uma vez.",
+        "Cada integrante atribuído deve estar disponível.",
+        "A função atribuída deve constar nas capacidades do integrante.",
+        "A ordem de etapas deve conter as três funções sem duplicação.",
+        "TRANSPORT_RESOURCE deve ocorrer depois de LOCATE_RESOURCE e ACTIVATE_CHECKPOINT.",
+        "É preciso revisar o plano antes de confirmá-lo.",
+        "Após a atualização, confira o estado do feed antes de confirmar.",
+        "Se send_ping estiver disponível após a atualização, envie NEXT_STEP_ACTIVATE_CHECKPOINT.",
+        "O plano deve ser revisto depois da atualização e antes de confirmar."
+      ],
+      "feed_revision": 1,
+      "completed_steps": [
+        "LOCATE_RESOURCE"
+      ],
+      "feed_message": "Atualização da equipe: LOCATE_RESOURCE foi concluída. A próxima etapa que precisa ser ativada é ACTIVATE_CHECKPOINT; depois será possível transportar o recurso.",
+      "required_communication": "NEXT_STEP_ACTIVATE_CHECKPOINT"
+    },
+    "available_actions": [
+      {
+        "name": "select_role",
+        "arguments": {
+          "member": "um integrante visível",
+          "role": "uma função do conjunto permitido"
+        }
+      },
+      {
+        "name": "set_step_order",
+        "arguments": {
+          "steps": [
+            "LOCATE_RESOURCE",
+            "ACTIVATE_CHECKPOINT",
+            "TRANSPORT_RESOURCE"
+          ]
+        }
+      },
+      {
+        "name": "open_checklist",
+        "arguments": {}
+      },
+      {
+        "name": "open_help",
+        "arguments": {
+          "topic": "mission_requirements | role_constraints | task_dependencies"
+        }
+      },
+      {
+        "name": "refresh_feed",
+        "arguments": {}
+      },
+      {
+        "name": "review_plan",
+        "arguments": {}
+      },
+      {
+        "name": "confirm_plan",
+        "arguments": {}
+      }
+    ]
+  },
+  "prompt": "Você é a política de ações do UXAgent, em uma tarefa sintética controlada. Escolha exatamente uma ação do schema por chamada. Não afirme que executou uma ação, não declare sucesso e não invente integrantes ou valores. Use apenas o estado visível e as ações presentes em available_actions. Siga o objetivo da tarefa recebida, corrija atribuições incompatíveis, consulte/atualize o feed quando necessário, comunique a próxima etapa se send_ping estiver disponível, revise o plano e só então confirme. Antes de responder, confira que o nome da ação está exatamente em available_actions. Nunca proponha uma ação ausente dessa lista nem repita uma ação rejeitada; após uma rejeição, leia o feedback e escolha uma alternativa atualmente disponível. Mecanismos de controle podem afetar a disponibilidade de informações ou ações; não suponha que uma ação oculta está disponível. Em T3, depois do feed, use remove_assignment uma única vez para member_C, atribua ACTIVATE_CHECKPOINT a member_D e TRANSPORT_RESOURCE a member_B; não use send_ping. Em T4, depois do feed, defina a ordem válida, envie o ping uma única vez e atribua TRANSPORT_RESOURCE a member_B e ACTIVATE_CHECKPOINT a member_C. Só use review_plan quando todas as funções estiverem cobertas e nunca repita uma ação aceita ou rejeitada sem mudança relevante no estado.\n\nEstado visível da interface (JSON):\n{\n  \"task_id\": \"T2\",\n  \"task\": \"T2 — Revisar o plano após uma atualização do feed, atualizar o estado observado, comunicar a próxima etapa se a ação de ping estiver disponível, atribuir todas as funções, revisar e confirmar o plano.\",\n  \"state\": {\n    \"task_id\": \"T2\",\n    \"objective\": \"Revisar o plano após uma atualização do feed, atualizar o estado observado, comunicar a próxima etapa se a ação de ping estiver disponível, atribuir todas as funções, revisar e confirmar o plano.\",\n    \"members\": {\n      \"member_A\": {\n        \"available\": true,\n        \"capabilities\": [\n          \"LOCATE_RESOURCE\",\n          \"ACTIVATE_CHECKPOINT\"\n        ]\n      },\n      \"member_B\": {\n        \"available\": true,\n        \"capabilities\": [\n          \"TRANSPORT_RESOURCE\"\n        ]\n      },\n      \"member_C\": {\n        \"available\": true,\n        \"capabilities\": [\n          \"ACTIVATE_CHECKPOINT\"\n        ]\n      }\n    },\n    \"assignments\": {\n      \"member_A\": \"ACTIVATE_CHECKPOINT\",\n      \"member_B\": \"TRANSPORT_RESOURCE\"\n    },\n    \"required_roles\": [\n      \"LOCATE_RESOURCE\",\n      \"ACTIVATE_CHECKPOINT\",\n      \"TRANSPORT_RESOURCE\"\n    ],\n    \"step_order\": [\n      \"LOCATE_RESOURCE\",\n      \"ACTIVATE_CHECKPOINT\",\n      \"TRANSPORT_RESOURCE\"\n    ],\n    \"reviewed\": false,\n    \"plan_confirmed\": false,\n    \"checklist_open\": false,\n    \"help_topic\": null,\n    \"feed_refreshes\": 1,\n    \"pings\": [\n      \"NEXT_STEP_ACTIVATE_CHECKPOINT\"\n    ],\n    \"actions_executed\": 4,\n    \"actions_proposed\": 22,\n    \"feedback\": \"Feed atualizado; a observação agora reflete o último estado recebido.\",\n    \"rules\": [\n      \"Cada uma das três funções deve ser atribuída exatamente uma vez.\",\n      \"Cada integrante atribuído deve estar disponível.\",\n      \"A função atribuída deve constar nas capacidades do integrante.\",\n      \"A ordem de etapas deve conter as três funções sem duplicação.\",\n      \"TRANSPORT_RESOURCE deve ocorrer depois de LOCATE_RESOURCE e ACTIVATE_CHECKPOINT.\",\n      \"É preciso revisar o plano antes de confirmá-lo.\",\n      \"Após a atualização, confira o estado do feed antes de confirmar.\",\n      \"Se send_ping estiver disponível após a atualização, envie NEXT_STEP_ACTIVATE_CHECKPOINT.\",\n      \"O plano deve ser revisto depois da atualização e antes de confirmar.\"\n    ],\n    \"feed_revision\": 1,\n    \"completed_steps\": [\n      \"LOCATE_RESOURCE\"\n    ],\n    \"feed_message\": \"Atualização da equipe: LOCATE_RESOURCE foi concluída. A próxima etapa que precisa ser ativada é ACTIVATE_CHECKPOINT; depois será possível transportar o recurso.\",\n    \"required_communication\": \"NEXT_STEP_ACTIVATE_CHECKPOINT\"\n  },\n  \"available_actions\": [\n    {\n      \"name\": \"select_role\",\n      \"arguments\": {\n        \"member\": \"um integrante visível\",\n        \"role\": \"uma função do conjunto permitido\"\n      }\n    },\n    {\n      \"name\": \"set_step_order\",\n      \"arguments\": {\n        \"steps\": [\n          \"LOCATE_RESOURCE\",\n          \"ACTIVATE_CHECKPOINT\",\n          \"TRANSPORT_RESOURCE\"\n        ]\n      }\n    },\n    {\n      \"name\": \"open_checklist\",\n      \"arguments\": {}\n    },\n    {\n      \"name\": \"open_help\",\n      \"arguments\": {\n        \"topic\": \"mission_requirements | role_constraints | task_dependencies\"\n      }\n    },\n    {\n      \"name\": \"refresh_feed\",\n      \"arguments\": {}\n    },\n    {\n      \"name\": \"review_plan\",\n      \"arguments\": {}\n    },\n    {\n      \"name\": \"confirm_plan\",\n      \"arguments\": {}\n    }\n  ]\n}\n\nRetorne somente a ação seguinte no formato especificado."
+}

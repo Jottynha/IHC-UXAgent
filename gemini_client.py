@@ -4,6 +4,8 @@ from __future__ import annotations
 import copy
 import json
 import os
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
 from jsonschema import Draft202012Validator
@@ -104,6 +106,11 @@ class GeminiActionPolicy:
         self.local_schema = load_action_schema()
         self.api_schema = to_gemini_schema(self.local_schema)
         self.validator = Draft202012Validator(self.local_schema)
+        trace_root = os.environ.get("UXAGENT_TRACE_DIR")
+        self.trace_root = Path(trace_root).expanduser() if trace_root else None
+        if self.trace_root:
+            self.trace_root.mkdir(parents=True, exist_ok=True)
+            self.trace_sequence = 0
 
     def propose_action(self, observation: dict[str, Any]) -> dict[str, Any]:
         instructions = (
@@ -130,6 +137,19 @@ class GeminiActionPolicy:
             f"{json.dumps(observation, ensure_ascii=False, indent=2)}\n\n"
             "Retorne somente a ação seguinte no formato especificado."
         )
+        if self.trace_root:
+            self.trace_sequence += 1
+            trace = {
+                "trace_version": "1.0",
+                "sequence": self.trace_sequence,
+                "timestamp": datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z"),
+                "model": self.model,
+                "prompt_version": "uxagent-action-prompt-v4",
+                "context": observation,
+                "prompt": prompt,
+            }
+            trace_path = self.trace_root / f"request-{self.trace_sequence:04d}.json"
+            trace_path.write_text(json.dumps(trace, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         try:
             response = self.client.interactions.create(
                 model=self.model,

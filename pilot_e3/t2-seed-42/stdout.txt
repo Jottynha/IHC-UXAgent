@@ -1,0 +1,18 @@
+UXAgent â€” T2: Revisar o plano apÃ³s uma atualizaÃ§Ã£o do feed, atualizar o estado observado, comunicar a prÃ³xima etapa se a aÃ§Ã£o de ping estiver disponÃ­vel, atribuir todas as funÃ§Ãµes, revisar e confirmar o plano.
+Modo: mock (sem API/custo)
+Modelo: mock-policy
+SessÃ£o: t2-20261105T212014Z-1f9c2b
+Mecanismos ativos: nenhum (linha de base)
+ParÃ¢metros: {"config_version": "uxagent-r1-r4-v2", "seed": 42, "mechanisms": {"R1": {"enabled": false, "parameter": "p_valida", "probability": 0.9}, "R2": {"enabled": false, "parameter": "p_comunicar", "probability": 0.65}, "R3": {"enabled": false, "parameter": "p_estado_fresco", "probability": 0.7}, "R4": {"enabled": false, "parameter": "p_ajuda_exposta", "probability": 0.25}}}
+
+Passo 1: select_role â†’ {'member': 'member_C', 'role': 'ACTIVATE_CHECKPOINT'} â€” AtribuiÃ§Ã£o registrada: member_C â†’ ACTIVATE_CHECKPOINT.
+Evento externo: o feed da equipe foi atualizado.
+Passo 2: send_ping â†’ {'code': 'NEXT_STEP_ACTIVATE_CHECKPOINT'} â€” Ping enviado: NEXT_STEP_ACTIVATE_CHECKPOINT.
+Passo 3: select_role â†’ {'member': 'member_B', 'role': 'TRANSPORT_RESOURCE'} â€” AtribuiÃ§Ã£o registrada: member_B â†’ TRANSPORT_RESOURCE.
+Passo 4: review_plan â†’ {} â€” Plano vÃ¡lido: funÃ§Ãµes cobertas, integrantes disponÃ­veis e dependÃªncias respeitadas.
+Passo 5: confirm_plan â†’ {} â€” Plano confirmado. O avaliador externo vai verificar o estado final.
+
+RESULTADO: SUCESSO
+T2 concluÃ­da: feed atualizado, comunicaÃ§Ã£o registrada e plano vÃ¡lido revisado e confirmado.
+Propostas processadas: 5; aÃ§Ãµes aceitas/executadas: 5
+Log JSONL: C:\Users\joao.silva\Documents\GitHub\IHC-UXAgent\pilot_e3\t2-seed-42\logs\t2-20261105T212014Z-1f9c2b.jsonl

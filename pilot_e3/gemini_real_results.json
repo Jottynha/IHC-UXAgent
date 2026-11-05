@@ -1,0 +1,36 @@
+{
+  "definition": {
+    "S": "external success",
+    "R": "successful recovery after functional error; null without opportunity",
+    "E": "events with functional error",
+    "A": "executed actions",
+    "help_used": "support_opened events"
+  },
+  "real_gemini_sessions": [
+    {
+      "file": "t1-20261105T212044Z-31e00a.jsonl",
+      "task": "T1",
+      "success": true,
+      "S": 1,
+      "R": null,
+      "E": 0,
+      "A": 6,
+      "help_used": 0,
+      "proposals": 6,
+      "technical_failures": 0
+    },
+    {
+      "file": "t2-20261105T212134Z-40346b.jsonl",
+      "task": "T2",
+      "success": null,
+      "S": 0,
+      "R": 0,
+      "E": 52,
+      "A": 4,
+      "help_used": 0,
+      "proposals": 56,
+      "technical_failures": 0
+    }
+  ],
+  "note": "One real Gemini session per calibration task; T2 reached the step limit and was externally unsuccessful."
+}

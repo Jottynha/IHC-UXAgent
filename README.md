@@ -136,3 +136,15 @@ Os artefatos HTA, CTT, GOMS/KLM e MoLIC estão em
 [`docs/ihc_design_artifacts_v1.md`](docs/ihc_design_artifacts_v1.md). O plano
 humano está em
 [`docs/human_validation_protocol_v1.md`](docs/human_validation_protocol_v1.md).
+O caderno formal complementar E1 está em
+[`docs/design_specification_e1.md`](docs/design_specification_e1.md).
+A auditoria contra o enunciado P3 e a fonte do relatório IEEE estão em
+[`docs/uxagent_p3_report.tex`](docs/uxagent_p3_report.tex). A fonte requer
+uma distribuição LaTeX com `IEEEtran` para gerar o PDF final.
+O piloto técnico e o pacote E3 estão em [`pilot_e3/`](pilot_e3), com execução
+reproduzível em [`tools/run_pilot.py`](tools/run_pilot.py). O roteiro de
+demonstração está em [`docs/demo_script_3_to_5_min.md`](docs/demo_script_3_to_5_min.md)
+e a submissão institucional está preparada em
+[`docs/institutional_review_checklist.md`](docs/institutional_review_checklist.md).
+O congelamento desses artefatos está em
+[`docs/freeze_manifest_v6.json`](docs/freeze_manifest_v6.json).
