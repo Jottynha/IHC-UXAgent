@@ -1,4 +1,4 @@
-"""Ambientes fictícios das tarefas de calibração T1 e T2 (sem interface gráfica)."""
+"""Ambientes fictícios das tarefas T1--T4, separados do estado de observação."""
 from __future__ import annotations
 
 from copy import deepcopy
@@ -213,3 +213,135 @@ class T2Environment(T1Environment):
         if "NEXT_STEP_ACTIVATE_CHECKPOINT" not in self.pings:
             return False, "A mudança do feed não foi comunicada com NEXT_STEP_ACTIVATE_CHECKPOINT."
         return True, "T2 concluída: feed atualizado, comunicação registrada e plano válido revisado e confirmado."
+
+
+@dataclass
+class T3Environment(T2Environment):
+    """Tarefa reservada: replanejar após a indisponibilidade de um integrante."""
+
+    @property
+    def task_id(self) -> str:
+        return "T3"
+
+    @property
+    def task_objective(self) -> str:
+        return "Corrigir uma atribuição após a indisponibilidade de um integrante, revisar e confirmar o plano."
+
+    def __post_init__(self) -> None:
+        self.members = {
+            "member_A": {"available": True, "capabilities": ["LOCATE_RESOURCE", "ACTIVATE_CHECKPOINT"]},
+            "member_B": {"available": True, "capabilities": ["TRANSPORT_RESOURCE", "LOCATE_RESOURCE"]},
+            "member_C": {"available": False, "capabilities": ["ACTIVATE_CHECKPOINT"]},
+            "member_D": {"available": True, "capabilities": ["TRANSPORT_RESOURCE", "ACTIVATE_CHECKPOINT"]},
+        }
+        self.assignments = {
+            "member_A": "LOCATE_RESOURCE",
+            "member_C": "ACTIVATE_CHECKPOINT",
+        }
+
+    def is_assignment_complete(self) -> bool:
+        return set(self.assignments.values()) == set(ROLES)
+
+    def trigger_feed_update(self) -> None:
+        if self.update_applied:
+            return
+        self.feed_revision += 1
+        self.completed_steps = ["LOCATE_RESOURCE"]
+        self.feed_message = (
+            "Atualização da equipe: member_C ficou indisponível. "
+            "Redistribua ACTIVATE_CHECKPOINT e preserve as dependências."
+        )
+        self.update_applied = True
+        self.last_feedback = "Atualização recebida: uma atribuição ficou inválida."
+
+    def snapshot(self) -> dict[str, Any]:
+        state = super().snapshot()
+        state.update({
+            "task_id": "T3",
+            "objective": self.task_objective,
+            "required_communication": None,
+            "rules": state["rules"] + [
+                "A atribuição de um integrante indisponível precisa ser removida.",
+                "A redistribuição deve manter cada função exatamente uma vez.",
+            ],
+        })
+        return state
+
+    def observation_snapshot(self) -> dict[str, Any]:
+        state = super().observation_snapshot()
+        state.update({
+            "task_id": "T3",
+            "objective": self.task_objective,
+            "required_communication": None,
+        })
+        return state
+
+    def externally_evaluate(self) -> tuple[bool, str]:
+        valid, reason = self.validate_plan()
+        if not self.plan_confirmed:
+            return False, "O plano não foi confirmado."
+        if not self.reviewed:
+            return False, "O plano não foi revisado antes da confirmação."
+        if not self.update_applied:
+            return False, "A indisponibilidade não foi comunicada pelo feed."
+        if "member_C" in self.assignments:
+            return False, "O integrante indisponível ainda possui atribuição."
+        if not valid:
+            return False, reason
+        if self.observed_feed_revision != self.feed_revision:
+            return False, "A observação não foi atualizada após a indisponibilidade."
+        return True, "T3 concluída: atribuição redistribuída, plano revisado e confirmado."
+
+
+@dataclass
+class T4Environment(T2Environment):
+    """Tarefa reservada: integrar missão, ordem e atualização do feed."""
+
+    @property
+    def task_id(self) -> str:
+        return "T4"
+
+    @property
+    def task_objective(self) -> str:
+        return "Integrar a missão e o feed, comunicar a próxima etapa, revisar e confirmar o plano."
+
+    def __post_init__(self) -> None:
+        if not self.assignments:
+            self.assignments["member_A"] = "LOCATE_RESOURCE"
+        self.step_order = [
+            "TRANSPORT_RESOURCE", "LOCATE_RESOURCE", "ACTIVATE_CHECKPOINT"
+        ]
+
+    def trigger_feed_update(self) -> None:
+        if self.update_applied:
+            return
+        self.feed_revision += 1
+        self.completed_steps = ["LOCATE_RESOURCE"]
+        self.feed_message = (
+            "Painel operacional: LOCATE_RESOURCE concluída. "
+            "A ordem válida exige ACTIVATE_CHECKPOINT antes de TRANSPORT_RESOURCE."
+        )
+        self.update_applied = True
+        self.last_feedback = "O painel operacional foi atualizado; integre-o à missão."
+
+    def snapshot(self) -> dict[str, Any]:
+        state = super().snapshot()
+        state.update({
+            "task_id": "T4",
+            "objective": self.task_objective,
+            "rules": state["rules"] + [
+                "A ordem deve integrar a dependência da missão e a atualização do painel.",
+            ],
+        })
+        return state
+
+    def observation_snapshot(self) -> dict[str, Any]:
+        state = super().observation_snapshot()
+        state.update({"task_id": "T4", "objective": self.task_objective})
+        return state
+
+    def externally_evaluate(self) -> tuple[bool, str]:
+        success, reason = super().externally_evaluate()
+        if not success:
+            return False, reason
+        return True, "T4 concluída: painéis integrados, comunicação registrada e plano confirmado."

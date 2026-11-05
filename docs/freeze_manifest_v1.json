@@ -1,0 +1,40 @@
+{
+  "freeze_id": "uxagent-technical-freeze-v1",
+  "frozen_at": "2026-11-05",
+  "status": "technical-baseline-frozen",
+  "scope": "T1/T2 synthetic calibration and instrumented low-fidelity web prototype",
+  "not_approved_for": [
+    "human validation",
+    "T3/T4 calibration",
+    "claims of empirical persona alignment"
+  ],
+  "versions": {
+    "ui_contract": "ui-contract-v1",
+    "prompt": "uxagent-action-prompt-v2",
+    "event_schema": "1.0",
+    "mechanism_config": "uxagent-r1-r4-v2",
+    "model": "gemini-3.5-flash-lite"
+  },
+  "configuration": {
+    "baseline_file": "uxagent_mechanisms.json",
+    "diagnostic_file": "config_diagnostica_R2_R3_R4.json",
+    "seed": 42,
+    "mechanisms_enabled_by_default": false
+  },
+  "frozen_files_sha256": {
+    "uxagent_actions.py": "da1b9854bdef000dbcc7b8f94f216cafe596cf09979182d4c8acd74cf2d42610",
+    "gemini_client.py": "eac069e5a202c7c3a3ef1be80a5cc56eeb21b91dacaf5e85690c9412fa764ee1",
+    "uxagent_session.py": "f1c430b2f09d39d801732160606b2016c7ea3a248f84732e853cf7db30a231a6",
+    "uxagent_web.py": "5273e5177678534d1280e98a222457491ab76575ead8280b4d5b5369ce888b07",
+    "controller.py": "228383fa771133e5b2b73d73c1aa425968cf44311cc556b03e92116309518028",
+    "environment.py": "ca053c6e16a50cec506117585e7742a405520569e31ca004fb55909e1b86fbc0",
+    "event_logger.py": "3255db1d2991780dff9d90ade57ea2d334de27f9a118aaaccb898904b3f01dff",
+    "uxagent_action.schema.json": "52f56aa3ed78e0df578218bf0ea8985ae393a3c0bb9bdd963a8e2c0546756fd0",
+    "uxagent_event.schema.json": "9ea2ae361f65202e0709e39e3c67f92f346aaa7bd1b04f497d9d9cbcb69588fc",
+    "uxagent_ui.schema.json": "54c116f2b44d3a7aabcc28b1fc87e089496a6a6ac650c339d2628117eb20bf9d",
+    "uxagent_mechanisms.json": "af664e5e24075dc5d919dd923799bbd1b646b9847823eabdb99503b5303958e7",
+    "config_diagnostica_R2_R3_R4.json": "8c42574a29ee69192974bb08143f95bcca74899d2a0e00b04f7fd382b7e61342",
+    "Tarefas_validacao_reservadas_v1.md": "433d834c448747af55d54940cd53f4333b78cc94c0fea1dec77eda3cabf790b6",
+    "requirements.txt": "903e5355bf14e5c84ef9291ee995e51a58c0a28c9f63feed9a0eb730de332af2"
+  }
+}

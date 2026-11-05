@@ -8,6 +8,7 @@ from typing import Any
 
 from environment import ROLES, T1Environment, T2Environment
 from mechanisms import MechanismConfig
+from uxagent_actions import validate_action
 
 
 @dataclass
@@ -21,6 +22,19 @@ class ActionResult:
     error: dict[str, Any] | None = None
     completed: bool = False
     mechanism_effect: dict[str, Any] | None = None
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "accepted": self.accepted,
+            "changed": self.changed,
+            "reason": self.reason,
+            "executed_action": copy.deepcopy(self.executed_action),
+            "reject": copy.deepcopy(self.reject),
+            "support": copy.deepcopy(self.support),
+            "error": copy.deepcopy(self.error),
+            "completed": self.completed,
+            "mechanism_effect": copy.deepcopy(self.mechanism_effect),
+        }
 
 
 class T1Controller:
@@ -49,7 +63,7 @@ class T1Controller:
             )
 
     def _resolve_communication_exposure(self) -> None:
-        if self._communication_exposed is None and isinstance(self.env, T2Environment) and self.env.update_applied:
+        if self._communication_exposed is None and self.env.task_id in {"T2", "T4"} and self.env.update_applied:
             self._communication_exposed = (
                 self._sample("R2") if self._enabled("R2") else True
             )
@@ -58,7 +72,10 @@ class T1Controller:
     def build_observation(self, base: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
         """Aplica R2--R4 ao que fica visível; retorna observação e metadados apenas para o log."""
         if isinstance(self.env, T2Environment) and self.env.update_applied:
-            if self._enabled("R3"):
+            if self.env.task_id == "T3":
+                # T3 reserves an explicit refresh opportunity after the change.
+                pass
+            elif self._enabled("R3"):
                 # Uma probabilidade por atualização; se perder a oportunidade, o cache só muda ao usar refresh_feed.
                 if self.env.feed_revision > self._last_r3_processed_revision:
                     if self._sample("R3"):
@@ -73,14 +90,26 @@ class T1Controller:
         observation = copy.deepcopy(base)
         observation["state"] = self.env.observation_snapshot()
         available = copy.deepcopy(base.get("available_actions", []))
-        if isinstance(self.env, T2Environment):
+        if self.env.task_id == "T1":
+            available = [
+                item for item in available
+                if item.get("name") not in {"send_ping", "refresh_feed", "remove_assignment"}
+            ]
+        elif self.env.task_id in {"T2", "T4"}:
+            available = [
+                item for item in available
+                if item.get("name") != "remove_assignment"
+            ]
+        if self.env.task_id in {"T2", "T4"}:
             # Ping is a one-time opportunity after the external feed update.
             if not self.env.update_applied or not self._communication_exposed:
                 available = [x for x in available if x.get("name") != "send_ping"]
-        if isinstance(self.env, T2Environment) and not self.env.update_applied:
+        if self.env.task_id in {"T2", "T4"} and not self.env.update_applied:
             # A ajuda contextual em T2 pertence à oportunidade de incerteza após o update.
             available = [x for x in available if x.get("name") != "open_help"]
-        if isinstance(self.env, T2Environment) and "NEXT_STEP_ACTIVATE_CHECKPOINT" in self.env.pings:
+        if self.env.task_id == "T3":
+            available = [x for x in available if x.get("name") != "open_help"]
+        if self.env.task_id in {"T2", "T4"} and "NEXT_STEP_ACTIVATE_CHECKPOINT" in self.env.pings:
             # T2 pede uma comunicação predefinida, não repetição de mensagens.
             # Depois do ping correto, a oportunidade se encerra e sai do menu visível.
             available = [x for x in available if x.get("name") != "send_ping"]
@@ -88,6 +117,19 @@ class T1Controller:
             # R4 controla especificamente a affordance open_help; checklist é separado.
             available = [x for x in available if x.get("name") != "open_help"]
         observation["available_actions"] = available
+        if self.env.task_id != "T3":
+            observation["available_actions"] = [
+                item for item in observation["available_actions"]
+                if item.get("name") != "remove_assignment"
+            ]
+        elif not any(
+            not self.env.members.get(member, {}).get("available", False)
+            for member in self.env.assignments
+        ):
+            observation["available_actions"] = [
+                item for item in observation["available_actions"]
+                if item.get("name") != "remove_assignment"
+            ]
         observed_metadata = {
             "visible_feed_revision": observation["state"].get("feed_revision"),
             "actual_feed_revision": self.env.feed_revision if isinstance(self.env, T2Environment) else None,
@@ -145,6 +187,19 @@ class T1Controller:
 
     def apply(self, action: dict[str, Any]) -> ActionResult:
         proposed_action = copy.deepcopy(action)
+        validation_error = validate_action(action)
+        if validation_error:
+            self.env.proposal_count += 1
+            reason = f"Ação rejeitada pelo schema local: {validation_error}"
+            error = {"category": "invalid_action", "opp_id": f"{self.env.task_id}-json-schema", "rule_id": "JSON-SCHEMA"}
+            self.env.last_feedback = reason
+            return ActionResult(
+                accepted=False,
+                changed=False,
+                reason=reason,
+                reject={"reason": reason, "rule_id": "JSON-SCHEMA"},
+                error=error,
+            )
         action, mechanism_effect = self._r1_transform(action)
         injected_r1 = bool(mechanism_effect and mechanism_effect.get("effect") == "slip_injected")
         name = action["name"]
@@ -191,6 +246,21 @@ class T1Controller:
                         changed = True
                     accepted = True
                     reason = f"Atribuição registrada: {member} → {role}."
+        elif name == "remove_assignment":
+            if self.env.task_id != "T3":
+                reason = "Esta ação só está disponível durante o replanejamento de T3."
+                error = {"category": "invalid_action", "opp_id": f"{self.env.task_id}-remove-assignment", "rule_id": "TASK-AFFORDANCE"}
+            else:
+                member = args["member"]
+                if member not in self.env.assignments:
+                    reason = f"{member} não possui atribuição para remover."
+                    error = {"category": "invalid_action", "opp_id": "T3-remove-missing", "rule_id": "ASSIGNMENT-EXISTS"}
+                else:
+                    del self.env.assignments[member]
+                    self.env.reviewed = False
+                    accepted = True
+                    changed = True
+                    reason = f"Atribuição de {member} removida para permitir o replanejamento."
         elif name == "set_step_order":
             steps = args["steps"]
             if len(steps) != len(ROLES) or set(steps) != set(ROLES):
@@ -235,7 +305,7 @@ class T1Controller:
             support = {"resource": "checklist", "opened": True, "topic": None}
             reason = "Checklist aberto: atribua cada função uma vez e respeite as capacidades dos integrantes."
         elif name == "open_help":
-            if (isinstance(self.env, T2Environment) and not self.env.update_applied) or self._help_exposed is False:
+            if (self.env.task_id in {"T2", "T4"} and not self.env.update_applied) or self._help_exposed is False:
                 reason = "R4: ajuda contextual não está exposta nesta oportunidade de suporte."
                 error = {"category": "invalid_action", "opp_id": "R4-support-opportunity", "rule_id": "R4-HELP-EXPOSED"}
             else:
@@ -254,13 +324,15 @@ class T1Controller:
             reason = "Feed atualizado; a observação reflete o estado mais recente disponível."
         elif name == "send_ping":
             code = args["code"]
-            if isinstance(self.env, T2Environment) and (not self.env.update_applied or not self._communication_exposed):
+            if self.env.task_id in {"T2", "T4"}:
+                self._resolve_communication_exposure()
+            if self.env.task_id not in {"T2", "T4"} or (not self.env.update_applied or not self._communication_exposed):
                 reason = "R2: a oportunidade de comunicação não está disponível nesta tarefa/estado."
                 error = {"category": "invalid_action", "opp_id": "R2-communication-opportunity", "rule_id": "R2-COMMUNICATE"}
-            elif isinstance(self.env, T2Environment) and code != "NEXT_STEP_ACTIVATE_CHECKPOINT":
+            elif self.env.task_id in {"T2", "T4"} and code != "NEXT_STEP_ACTIVATE_CHECKPOINT":
                 reason = "T2 exige o ping NEXT_STEP_ACTIVATE_CHECKPOINT; o código proposto não satisfaz a comunicação da tarefa."
                 error = {"category": "invalid_action", "opp_id": "T2-ping-code", "rule_id": "T2-COMMUNICATION-CODE"}
-            elif isinstance(self.env, T2Environment) and code in self.env.pings:
+            elif self.env.task_id in {"T2", "T4"} and code in self.env.pings:
                 reason = "A comunicação exigida já foi enviada; não envie o mesmo ping novamente."
                 error = {"category": "redundant_action", "opp_id": "T2-ping-once", "rule_id": "T2-PING-ONCE"}
             else:

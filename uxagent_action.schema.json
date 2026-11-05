@@ -47,6 +47,33 @@
       ],
       "properties": {
         "name": {
+          "const": "remove_assignment"
+        },
+        "arguments": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "member"
+          ],
+          "properties": {
+            "member": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      },
+      "description": "Remove explicitamente uma atribuição inválida durante o replanejamento de T3."
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "arguments"
+      ],
+      "properties": {
+        "name": {
           "const": "set_step_order"
         },
         "arguments": {

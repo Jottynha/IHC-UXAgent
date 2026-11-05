@@ -1,118 +1,138 @@
-# UXAgent — protótipo T1/T2 com Gemini e mecanismos R1–R4
+# UXAgent
 
-Este pacote implementa duas tarefas de calibração sintéticas, sem interface gráfica. O Gemini propõe uma ação estruturada; o controlador local executa as regras e mecanismos; o avaliador externo calcula o resultado pelo estado verdadeiro do ambiente; e os eventos são gravados em JSONL validado pelo schema do projeto.
+Protótipo sintético para depurar um protocolo de avaliação de interação em um
+lobby cooperativo. O projeto separa ambiente, observação, política, controlador,
+instrumentação e avaliador externo. Ele **não representa jogadores humanos** e
+não deve ser usado para inferir comportamento real.
 
-**Importante:** R1–R4 são hipóteses de engenharia para depurar o protótipo. Não representam probabilidades medidas de jogadores humanos e não validam que o agente imita pessoas. T3/T4 permanecem reservadas e não são executadas neste pacote.
+## Estado atual
 
-## Mecanismos implementados
+- T1 e T2 implementadas e executáveis.
+- R1--R4 parametrizados, desligados por padrão e fora do prompt do modelo.
+- Ações fechadas e validadas por JSON Schema.
+- Avaliador externo baseado no estado verdadeiro.
+- Logs JSONL validados pelo schema de eventos.
+- Fachada `UXAgentSession` pronta para uma futura interface web/desktop.
+- T3 e T4 implementadas em versão independente para validação reservada.
+- Interface web local de baixa fidelidade implementada; design visual final ainda não implementado.
+- Base técnica congelada para reprodução em [`docs/freeze_manifest_v2.json`](docs/freeze_manifest_v2.json).
 
-- **R1 — `p_valida = 0.90`:** nas oportunidades válidas de `select_role`, o controlador mantém a proposta com a probabilidade configurada. Caso contrário, injeta um deslize de atribuição usando uma ação permitida pelo schema, mas incompatível com a capacidade declarada do integrante. O deslize modifica o estado, fica registrado como erro `operational_slip`, com regra identificada como R1 e deve ser detectado/corrigido pela política ou pelo avaliador.
-- **R2 — `p_comunicar = 0.65`:** em T2, depois do evento de atualização do feed, define se a ação `send_ping` fica exposta. Se não há oportunidade, a ação não aparece no menu visível e uma tentativa direta é rejeitada. Quando o ping correto `NEXT_STEP_ACTIVATE_CHECKPOINT` é enviado, `send_ping` sai do menu de ações e um envio repetido é rejeitado; T2 exige comunicar a próxima etapa uma vez, não repetir mensagens.
-- **R3 — `p_estado_fresco = 0.70`:** em T2, quando chega a atualização predefinida, o controlador decide uma vez se a informação nova será entregue à observação. Se falhar, o agente continua vendo o cache antigo até chamar `refresh_feed`. O estado verdadeiro permanece separado para o avaliador e para os logs.
-- **R4 — `p_ajuda_exposta = 0.25`:** controla a exposição da ação `open_help` na oportunidade de incerteza. Não representa a probabilidade de uma pessoa procurar ajuda. O checklist permanece como recurso separado.
+## Estrutura
 
-Todas as chaves vêm desligadas por padrão. Os valores/probabilidades são carregados de `uxagent_mechanisms.json`; a configuração efetiva e uma impressão digital curta aparecem no log para reprodutibilidade.
+| Arquivo | Responsabilidade |
+|---|---|
+| `environment.py` | Estado verdadeiro, regras e oráculos de T1/T2 |
+| `controller.py` | Pré-condições, transições e mecanismos R1--R4 |
+| `uxagent_session.py` | Fachada para interface e integração, sem expor estado indevido |
+| `uxagent_actions.py` | Vocabulário, templates e validação de ações |
+| `gemini_client.py` | Adaptador opcional para Gemini |
+| `event_logger.py` | Eventos JSONL validados |
+| `metrics.py` | Resumos auditáveis de sessões |
+| `resumir_logs_uxagent.py` | Resumo seguro de logs |
+| `uxagent_cli.py` | Executor CLI de T1/T2 |
+| `uxagent_action.schema.json` | Contrato de ações |
+| `uxagent_event.schema.json` | Contrato de eventos |
+| `uxagent_ui.schema.json` | Contrato do modelo entregue à interface |
+| `uxagent_mechanisms.json` | Configuração padrão de mecanismos |
+| `config_diagnostica_R2_R3_R4.json` | Configuração extrema para testes determinísticos |
+| `tests/` | Testes de schemas, domínio, mecanismos, CLI e fachada |
+| `docs/` | Requisitos, modelagem, design e rastreabilidade |
 
-## Instalação (Linux)
+## Instalação
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+```powershell
+py -3.14 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-## Testar sem API e sem custo
+## Execução sem API
 
-T1, linha de base:
-
-```bash
-python run_uxagent_t1.py --mock --task T1
+```powershell
+.\.venv\Scripts\python.exe uxagent_cli.py --mock --task T1
+.\.venv\Scripts\python.exe uxagent_cli.py --mock --task T2
+.\.venv\Scripts\python.exe uxagent_cli.py --mock --task T3
+.\.venv\Scripts\python.exe uxagent_cli.py --mock --task T4
+.\.venv\Scripts\python.exe uxagent_web.py --task T1
 ```
 
-T2, linha de base:
+Abra `http://127.0.0.1:8765/` para usar o lobby local. A interface chama
+`UXAgentSession`, mantém T1/T2 no mesmo controlador da CLI, exibe apenas as
+ações permitidas e oferece avaliação externa após a confirmação. O servidor web
+grava os eventos em `logs/` quando iniciado pelo comando acima.
 
-```bash
-python run_uxagent_t1.py --mock --task T2
+Ativando mecanismos:
+
+```powershell
+.\.venv\Scripts\python.exe uxagent_cli.py --mock --task T2 --enable R2,R3,R4 --seed 42
+.\.venv\Scripts\python.exe uxagent_cli.py --mock --task T2 --enable R2,R3,R4 `
+  --config config_diagnostica_R2_R3_R4.json --seed 42
 ```
 
-Executar a suíte completa:
+Cada execução cria `logs/<session-id>.jsonl`. A pasta é resultado de execução e
+não deve conter dados reais nem ser usada como fonte de requisitos.
 
-```bash
-python3 -m unittest discover -s tests -v
+## Execução com Gemini
+
+Copie `.env.example` para `.env`, abra o arquivo e substitua
+`cole_sua_chave_aqui` pela sua chave do Gemini. O `.env` está no `.gitignore` e
+não deve ser commitado:
+
+```powershell
+Copy-Item .env.example .env
+notepad .env
+.\.venv\Scripts\python.exe uxagent_cli.py --task T2 --max-steps 20
 ```
 
-O cálculo auditável das métricas mínimas está em `metrics.py`:
+Também é possível definir `GEMINI_API_KEY` ou `GOOGLE_API_KEY` diretamente no
+ambiente do terminal; variáveis já exportadas têm prioridade sobre `.env`.
+Nunca compartilhe a chave nem a registre em logs.
 
-```python
-from metrics import summarize_session, summarize_sessions
+## Testes
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+.\.venv\Scripts\python.exe -m compileall -q .
 ```
 
-`summary["success"]` é `None` quando a sessão não permite avaliação independente, por exemplo após falha técnica. Denominadores nulos também retornam `None`; resultados sintéticos não são convertidos em medidas humanas.
+## Decisão sobre implementar a interface
 
-Resumir logs sem despejar estados e notas brutas (copie o resumo para compartilhar, nunca a chave API):
+**Sim, já podemos iniciar a interface de baixa fidelidade e a implementação
+visual de T1/T2**, porque os requisitos essenciais estão definidos:
 
-```bash
-python resumir_logs_uxagent.py --all --output resumo_logs_uxagent.txt
-```
+1. tarefas, objetivos e critérios de sucesso externos;
+2. vocabulário de ações e pré-condições;
+3. separação entre estado verdadeiro e observação;
+4. suporte por checklist, ajuda, feed e ping;
+5. eventos e métricas mínimas;
+6. mecanismos controláveis e configuração versionada;
+7. testes automatizados para o núcleo.
 
-## Executar com Gemini
+O mesmo `UXAgentSession`,
+`view_model()` e `dispatch()` deve ser usado pela GUI e pelos testes.
 
-Use somente a chave nova criada após revogar a chave exposta. Não a salve em arquivos, não a inclua no código e não a envie por mensagem. Use apenas estados fictícios.
+O congelamento técnico foi realizado, mas ele não representa aprovação para
+validação humana. A revisão detalhada contra os PDFs oficiais está em
+[`docs/repository_review_2026-11-05.md`](docs/repository_review_2026-11-05.md).
+Ainda faltam os artefatos formais de HTA, CTT, GOMS/KLM, MoLIC, metamensagem,
+signos, protocolo humano, tolerâncias e aprovação ética.
 
-```bash
-read -rsp "Chave Gemini API: " GEMINI_API_KEY
-echo
-export GEMINI_API_KEY
-python run_uxagent_t1.py --task T1 --max-steps 20
-```
+O contrato visual está versionado como `ui-contract-v2`; o prompt estruturado
+está versionado como `uxagent-action-prompt-v4`. Uma interface deve rejeitar
+ou adaptar explicitamente versões incompatíveis, nunca interpretar campos por
+posição ou por texto livre.
 
-Para testar T2, use `--task T2`. Cada ação proposta pelo Gemini pode consumir uma chamada da API.
+## Limitações
 
-## Ativar mecanismos
+Os números de R1--R4 são hipóteses de engenharia, não probabilidades humanas.
+O modo mock testa integração e oráculos, não qualidade do modelo. Logs sintéticos
+não substituem participantes, métricas humanas ou validação externa.
 
-Ativar só R1 na tarefa T1 (a semente 2 demonstra a injeção de pelo menos um deslize com a sequência aleatória atual):
-
-```bash
-python run_uxagent_t1.py --mock --task T1 --enable R1 --seed 2
-```
-
-R2 e R3 têm oportunidades definidas em T2; se ativados em T1, o programa avisa que não alteram essa tarefa.
-
-Ativar R2, R3 e R4 em T2:
-
-```bash
-python run_uxagent_t1.py --mock --task T2 --enable R2,R3,R4 --seed 42
-```
-
-Para uma verificação diagnóstica dos caminhos raros, existe `config_diagnostica_R2_R3_R4.json`: R2=1.0 sempre expõe o ping, R3=0.0 força uma observação obsoleta até `refresh_feed`, e R4=1.0 expõe a ajuda contextual. É uma configuração extrema apenas para verificar o código, não para calibrar ou representar jogadores:
-
-```bash
-python run_uxagent_t1.py --mock --task T2 --enable R2,R3,R4 --config config_diagnostica_R2_R3_R4.json --seed 42
-```
-
-Ativar todos em T2 (R1 também atuará nas seleções de função):
-
-```bash
-python run_uxagent_t1.py --mock --task T2 --enable R1,R2,R3,R4 --seed 42
-```
-
-Para alterar probabilidades, copie/edite `uxagent_mechanisms.json` ou modifique a configuração usada com `--config /caminho/arquivo.json`. Para testar limites determinísticos, use probabilidades `0.0` e `1.0`. A opção `--seed` torna as decisões aleatórias do controlador reproduzíveis. A semente não torna as respostas do LLM necessariamente determinísticas.
-
-Primeiro execute as demonstrações com `--mock`, sem custos. Quando os efeitos estiverem claros, repita uma tarefa com Gemini real removendo `--mock` da linha de comando. Exemplo: `python run_uxagent_t1.py --task T2 --enable R2,R3,R4 --seed 42`. Cada ação proposta pode gerar uma chamada à API, e uma sessão pode terminar em falha por efeito intencional de um mecanismo; confira os logs antes de repetir.
-
-## Onde estão os resultados
-
-Cada execução cria `logs/<session-id>.jsonl`. Os eventos registram tarefa, versão/hash da configuração, ação proposta, ação executada, estado verdadeiro e visível, rejeições, erro, oportunidade, resultado externo e origem sintética. O contador `actions_executed` só aumenta para ações aceitas; `actions_proposed` conta tentativas processadas, incluindo rejeições. O log nunca deve receber dados reais de pessoas para os testes com API.
-
-## Limites conhecidos nesta versão
-
-- CLI apenas; ainda não há interface gráfica clicável.
-- T1 e T2 são tarefas de calibração sintéticas.
-- T3/T4 continuam reservadas para uma validação independente.
-- R1 injeta um deslize ao efetivar uma atribuição incompatível na simulação; isso é um mecanismo de teste, não um modelo empiricamente calibrado de erro humano.
-- R2 pode tornar impossível concluir a exigência de comunicação quando `send_ping` não está disponível. Isso é intencional para observar a consequência da affordance, mas precisa ser relatado como efeito do cenário manipulado.
-- A primeira análise dos logs reais de T2 (configuração v1) mostrou cinco pings na mesma tarefa; na configuração v2, o ping correto é uma oportunidade única e sai do menu após o envio. A integração atual foi verificada com testes unitários e modo mock; o Gemini real deve ser executado novamente com v2 para confirmar que reduz a repetição.
-- R3 testa uma oportunidade de atualização por evento de feed; não simula todos os aspectos de percepção/memória humana.
-- O modo `--mock` verifica integração e oráculos de modo reproduzível, mas não testa qualidade do Gemini.
-- Não coletar participantes nem enviar dados pessoais à API sem o procedimento e a autorização institucional aplicáveis.
+Os PDFs de requisitos estão em [`docs/`](docs/). T3/T4 estão descritas em
+[`Tarefas_validacao_reservadas_v1.md`](Tarefas_validacao_reservadas_v1.md) e
+implementadas sem usar seus resultados para calibrar T1/T2.
+A matriz de rastreabilidade está em
+[`docs/requirements_traceability.md`](docs/requirements_traceability.md).
+Os artefatos HTA, CTT, GOMS/KLM e MoLIC estão em
+[`docs/ihc_design_artifacts_v1.md`](docs/ihc_design_artifacts_v1.md). O plano
+humano está em
+[`docs/human_validation_protocol_v1.md`](docs/human_validation_protocol_v1.md).

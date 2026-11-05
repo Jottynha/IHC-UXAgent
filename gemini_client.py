@@ -4,25 +4,16 @@ from __future__ import annotations
 import copy
 import json
 import os
-from pathlib import Path
 from typing import Any
 
 from jsonschema import Draft202012Validator
+from uxagent_actions import load_action_schema
 
-BASE_DIR = Path(__file__).resolve().parent
-ACTION_SCHEMA_PATH = BASE_DIR / "uxagent_action.schema.json"
 DEFAULT_MODEL = "gemini-3.5-flash-lite"
 
 
 class GeminiClientError(RuntimeError):
     """Erro de chamada/parse à API; nunca inclui a chave de API."""
-
-
-def load_action_schema() -> dict[str, Any]:
-    with ACTION_SCHEMA_PATH.open("r", encoding="utf-8") as f:
-        schema = json.load(f)
-    Draft202012Validator.check_schema(schema)
-    return schema
 
 
 def _remove_unsupported_api_keywords(node: Any) -> None:
@@ -65,10 +56,38 @@ def to_gemini_schema(local_schema: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _load_local_env() -> None:
+    """Carrega variáveis simples de .env sem substituir variáveis já exportadas."""
+    env_path = os.path.join(os.path.dirname(__file__), ".env")
+    try:
+        with open(env_path, encoding="utf-8") as env_file:
+            lines = env_file.readlines()
+    except FileNotFoundError:
+        return
+    except OSError as exc:
+        raise GeminiClientError(f"Não foi possível ler o arquivo .env: {exc}") from exc
+
+    for line_number, raw_line in enumerate(lines, start=1):
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if "=" not in line:
+            raise GeminiClientError(
+                f"Entrada inválida no .env, linha {line_number}: esperada no formato NOME=VALOR."
+            )
+        name, value = (part.strip() for part in line.split("=", 1))
+        if not name or not name.replace("_", "").isalnum() or name[0].isdigit():
+            raise GeminiClientError(f"Nome de variável inválido no .env, linha {line_number}.")
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
+            value = value[1:-1]
+        os.environ.setdefault(name, value)
+
+
 class GeminiActionPolicy:
     """Pede uma única ação ao Gemini, sem executar ou avaliar a ação por conta própria."""
 
     def __init__(self, model: str | None = None) -> None:
+        _load_local_env()
         api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
         if not api_key:
             raise GeminiClientError(
@@ -94,9 +113,17 @@ class GeminiActionPolicy:
             "o estado visível e as ações presentes em available_actions. Siga o objetivo da "
             "tarefa recebida, corrija atribuições incompatíveis, consulte/atualize o feed "
             "quando necessário, comunique a próxima etapa se send_ping estiver disponível, "
-            "revise o plano e só então confirme. Se uma ação for rejeitada, leia o feedback "
-            "atualizado e tente uma alternativa válida. Mecanismos de controle podem afetar "
-            "a disponibilidade de informações ou ações; não suponha que uma ação oculta está disponível."
+            "revise o plano e só então confirme. Antes de responder, confira que o nome da "
+            "ação está exatamente em available_actions. Nunca proponha uma ação ausente dessa "
+            "lista nem repita uma ação rejeitada; após uma rejeição, leia o feedback e escolha "
+            "uma alternativa atualmente disponível. Mecanismos de controle podem afetar a "
+            "disponibilidade de informações ou ações; não suponha que uma ação oculta está disponível. "
+            "Em T3, depois do feed, use remove_assignment uma única vez para member_C, atribua "
+            "ACTIVATE_CHECKPOINT a member_D e TRANSPORT_RESOURCE a member_B; não use send_ping. "
+            "Em T4, depois do feed, defina a ordem válida, envie o ping uma única vez e atribua "
+            "TRANSPORT_RESOURCE a member_B e ACTIVATE_CHECKPOINT a member_C. Só use review_plan "
+            "quando todas as funções estiverem cobertas e nunca repita uma ação aceita ou rejeitada "
+            "sem mudança relevante no estado."
         )
         prompt = (
             f"{instructions}\n\nEstado visível da interface (JSON):\n"

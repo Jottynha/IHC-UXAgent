@@ -19,7 +19,7 @@ class MockEndToEndTests(unittest.TestCase):
             env = os.environ.copy()
             env["UXAGENT_LOG_DIR"] = str(Path(tmp) / "logs")
             result = subprocess.run(
-                [sys.executable, str(BASE / "run_uxagent_t1.py"), "--mock"],
+                [sys.executable, str(BASE / "uxagent_cli.py"), "--mock"],
                 cwd=BASE,
                 env=env,
                 text=True,
@@ -46,7 +46,7 @@ class MockEndToEndTests(unittest.TestCase):
             env = os.environ.copy()
             env["UXAGENT_LOG_DIR"] = str(Path(tmp) / "logs")
             result = subprocess.run(
-                [sys.executable, str(BASE / "run_uxagent_t1.py"), "--mock", "--task", "T2"],
+                [sys.executable, str(BASE / "uxagent_cli.py"), "--mock", "--task", "T2"],
                 cwd=BASE, env=env, text=True, capture_output=True, timeout=20, check=False,
             )
             self.assertEqual(result.returncode, 0, result.stdout + "\n" + result.stderr)
@@ -77,7 +77,7 @@ class MockEndToEndTests(unittest.TestCase):
             env = os.environ.copy()
             env["UXAGENT_LOG_DIR"] = str(root / "logs")
             result = subprocess.run(
-                [sys.executable, str(BASE / "run_uxagent_t1.py"), "--mock", "--task", "T1",
+                [sys.executable, str(BASE / "uxagent_cli.py"), "--mock", "--task", "T1",
                  "--enable", "R1", "--config", str(cfg), "--max-steps", "1"],
                 cwd=BASE, env=env, text=True, capture_output=True, timeout=20, check=False,
             )
@@ -102,7 +102,7 @@ class MockEndToEndTests(unittest.TestCase):
             env = os.environ.copy()
             env["UXAGENT_LOG_DIR"] = str(root / "logs")
             result = subprocess.run(
-                [sys.executable, str(BASE / "run_uxagent_t1.py"), "--mock", "--task", "T2",
+                [sys.executable, str(BASE / "uxagent_cli.py"), "--mock", "--task", "T2",
                  "--enable", "R2", "--config", str(cfg), "--max-steps", "10"],
                 cwd=BASE, env=env, text=True, capture_output=True, timeout=20, check=False,
             )
@@ -121,7 +121,7 @@ class MockEndToEndTests(unittest.TestCase):
             env = os.environ.copy()
             env["UXAGENT_LOG_DIR"] = str(root / "logs")
             result = subprocess.run(
-                [sys.executable, str(BASE / "run_uxagent_t1.py"), "--mock", "--task", "T2",
+                [sys.executable, str(BASE / "uxagent_cli.py"), "--mock", "--task", "T2",
                  "--enable", "R3", "--config", str(cfg), "--max-steps", "12"],
                 cwd=BASE, env=env, text=True, capture_output=True, timeout=20, check=False,
             )

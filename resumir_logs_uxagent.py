@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Gera um resumo seguro e compacto dos logs JSONL do protótipo UXAgent.
 
-Execute colocando este arquivo na pasta do projeto, ao lado de run_uxagent_t1.py:
+Execute colocando este arquivo na pasta do projeto, ao lado de uxagent_cli.py:
     python resumir_logs_uxagent.py
 Opcionalmente:
     python resumir_logs_uxagent.py --all
-    python resumir_logs_uxagent.py --logs logs --output resumo_logs_uxagent.txt
+    python resumir_logs_uxagent.py --logs logs --output resumo.txt
 """
 from __future__ import annotations
 import argparse
@@ -186,7 +186,7 @@ def summarize(path: Path) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Resume logs JSONL do protótipo UXAgent sem imprimir o conteúdo completo.")
     parser.add_argument("--logs", default="logs", help="Pasta dos logs (padrão: logs)")
-    parser.add_argument("--output", default="resumo_logs_uxagent.txt", help="Arquivo de saída")
+    parser.add_argument("--output", default="resumo.txt", help="Arquivo de saída")
     parser.add_argument("--all", action="store_true", help="Resume todos os logs; por padrão usa as 10 sessões mais recentes")
     args = parser.parse_args()
     log_dir = Path(args.logs).expanduser()

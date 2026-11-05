@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from jsonschema import Draft202012Validator, FormatChecker
+from uxagent_actions import PROMPT_VERSION, UI_VERSION
 
 
 class EventLogger:
@@ -61,10 +62,10 @@ class EventLogger:
             "actor": actor,
             "synthetic": True,
             "cfg_ver": self.config_version,
-            "ui_ver": "cli-environment-v2",
+            "ui_ver": UI_VERSION,
             "llm_model": self.model if actor == "llm" else None,
             "llm_version": None,
-            "prompt_ver": "uxagent-action-prompt-v2" if actor == "llm" else None,
+            "prompt_ver": PROMPT_VERSION if actor == "llm" else None,
             "step": step,
             "event": event,
             "ts_sys": datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z"),

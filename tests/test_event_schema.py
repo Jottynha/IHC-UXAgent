@@ -109,6 +109,18 @@ class EventSchemaTests(unittest.TestCase):
         )
         self.assert_invalid(event)
 
+    def test_08_redundant_action_error_is_valid(self):
+        event = make_event(
+            event="action_rejected",
+            act_prop=None,
+            error={
+                "category": "redundant_action",
+                "opp_id": "T2-ping-once",
+                "rule_id": "T2-PING-ONCE",
+            },
+        )
+        self.assert_valid(event)
+
     def test_08_human_origin_cannot_be_marked_synthetic(self):
         self.assert_invalid(make_event(actor="human", synthetic=True))
 
@@ -149,6 +161,10 @@ class EventSchemaTests(unittest.TestCase):
             obs_id=None,
             state_pre=None,
         )
+        self.assert_valid(event)
+
+    def test_15_ui_version_is_nonempty(self):
+        event = make_event(ui_ver="ui-contract-v1")
         self.assert_valid(event)
 
 

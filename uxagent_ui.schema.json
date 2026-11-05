@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "UXAgent UI view model",
+  "description": "Contrato serializável entre a sessão do UXAgent e uma futura interface.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "session_id",
+    "ui_version",
+    "task_id",
+    "step",
+    "status",
+    "objective",
+    "members",
+    "assignments",
+    "required_roles",
+    "missing_roles",
+    "step_order",
+    "reviewed",
+    "plan_confirmed",
+    "checklist_open",
+    "help_topic",
+    "feed",
+    "feedback",
+    "available_actions",
+    "metadata",
+    "history"
+  ],
+  "properties": {
+    "session_id": {"type": "string", "minLength": 1},
+    "ui_version": {"type": "string", "minLength": 1},
+    "task_id": {"type": "string", "enum": ["T1", "T2", "T3", "T4"]},
+    "step": {"type": "integer", "minimum": 0},
+    "status": {"type": "string", "enum": ["active", "completed"]},
+    "objective": {"type": "string", "minLength": 1},
+    "members": {"type": "object"},
+    "assignments": {"type": "object", "additionalProperties": {"type": "string"}},
+    "required_roles": {"type": "array", "items": {"type": "string"}},
+    "missing_roles": {"type": "array", "items": {"type": "string"}},
+    "step_order": {"type": "array", "items": {"type": "string"}},
+    "reviewed": {"type": "boolean"},
+    "plan_confirmed": {"type": "boolean"},
+    "checklist_open": {"type": "boolean"},
+    "help_topic": {"type": ["string", "null"]},
+    "feed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revision", "message", "completed_steps"],
+      "properties": {
+        "revision": {"type": "integer", "minimum": 0},
+        "message": {"type": "string"},
+        "completed_steps": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "feedback": {"type": "string"},
+    "available_actions": {"type": "array", "items": {"type": "object"}},
+    "metadata": {"type": "object"},
+    "history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["event", "step", "action", "accepted", "reason", "timestamp"],
+        "properties": {
+          "event": {"type": "string", "enum": ["action_executed", "action_rejected"]},
+          "step": {"type": "integer", "minimum": 1},
+          "action": {"type": ["object", "null"]},
+          "accepted": {"type": "boolean"},
+          "reason": {"type": "string"},
+          "timestamp": {"type": "string", "format": "date-time"},
+          "error": {"type": ["object", "null"]},
+          "executed_action": {"type": ["object", "null"]}
+        }
+      }
+    }
+  }
+}

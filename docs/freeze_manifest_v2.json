@@ -1,0 +1,42 @@
+{
+  "freeze_id": "uxagent-technical-freeze-v2",
+  "frozen_at": "2026-11-05",
+  "status": "independent-tasks-and-design-artifacts-frozen",
+  "scope": "T1/T2 synthetic calibration, independent T3/T4 workflows, and low-fidelity instrumented prototype",
+  "not_approved_for": [
+    "human validation before institutional review",
+    "using T3/T4 results to calibrate T1/T2",
+    "claims of empirical persona alignment"
+  ],
+  "versions": {
+    "ui_contract": "ui-contract-v2",
+    "prompt": "uxagent-action-prompt-v4",
+    "event_schema": "1.0",
+    "mechanism_config": "uxagent-r1-r4-v2",
+    "model": "gemini-3.5-flash-lite"
+  },
+  "configuration": {
+    "baseline_file": "uxagent_mechanisms.json",
+    "diagnostic_file": "config_diagnostica_R2_R3_R4.json",
+    "seed": 42,
+    "mechanisms_enabled_by_default": false
+  },
+  "frozen_files_sha256": {
+    "uxagent_actions.py": "c2745dbf2e4b0c1ddd8af795e40e94c25a1bdfa935a4013ef69497cfa3888b65",
+    "gemini_client.py": "15032a94376126047e04d400be3f5171340025e51ae180d7d7d3961b3107a5e3",
+    "uxagent_session.py": "d27d310f8d399b67aecedd803c0d546d0ae1ceafa6a7c70cfc5f531f7d96b200",
+    "uxagent_web.py": "0f8d9b6aeca2212c9f36d085a8d1214658c4d9f9a01ab60003a564839ad8efa6",
+    "controller.py": "ef3e98db68a1bee022d66bdd77b8adc84bdab15b8343fcf7cce168c8681e5bc3",
+    "environment.py": "3a8b208da5f0418cf1596bdf91d0f9a37e03512d28b0153db39be48a3ecc8cc0",
+    "event_logger.py": "3255db1d2991780dff9d90ade57ea2d334de27f9a118aaaccb898904b3f01dff",
+    "uxagent_action.schema.json": "e8c2a62d42a47ef08755d297558cfce131297e7d15e665f96a408cd8036e2652",
+    "uxagent_event.schema.json": "bba8eb0d6b94059f7f4a70a5835ef9a995eb55105685c7084af9c788d2e6b8a0",
+    "uxagent_ui.schema.json": "20431752415c857b6b260faa575c0b4d95ac126b0b217cae8cefcf5df2e670f4",
+    "uxagent_mechanisms.json": "af664e5e24075dc5d919dd923799bbd1b646b9847823eabdb99503b5303958e7",
+    "config_diagnostica_R2_R3_R4.json": "8c42574a29ee69192974bb08143f95bcca74899d2a0e00b04f7fd382b7e61342",
+    "Tarefas_validacao_reservadas_v2.md": "bab2565088cb7f1861482a95e64f87fc84ad5938cfda5ad5dbb06c5fb1980ba5",
+    "requirements.txt": "903e5355bf14e5c84ef9291ee995e51a58c0a28c9f63feed9a0eb730de332af2",
+    "docs/ihc_design_artifacts_v1.md": "616b4f3b0b3e0a167cfddf152f7273f3b381f4ed7eb040d96f2ecc406373ebac",
+    "docs/human_validation_protocol_v1.md": "d07486dd00027113747e6f200bf77e3fd8fcf34c7915962f4ab10ad06a940415"
+  }
+}

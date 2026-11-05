@@ -244,6 +244,7 @@
           "type": "string",
           "enum": [
             "select_role",
+            "remove_assignment",
             "set_step_order",
             "send_ping",
             "open_checklist",
@@ -352,6 +353,7 @@
             "skill_constraint_violation",
             "dependency_violation",
             "invalid_action",
+            "redundant_action",
             "other"
           ]
         },

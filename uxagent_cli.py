@@ -12,25 +12,16 @@ from pathlib import Path
 from typing import Any
 
 from controller import T1Controller
-from environment import T1Environment, T2Environment
+from environment import T1Environment, T2Environment, T3Environment, T4Environment
 from event_logger import EventLogger
-from gemini_client import DEFAULT_MODEL, GeminiActionPolicy, GeminiClientError, load_action_schema
+from gemini_client import DEFAULT_MODEL, GeminiActionPolicy, GeminiClientError
 from jsonschema import Draft202012Validator
 from mechanisms import MechanismConfig
+from uxagent_actions import ACTION_TEMPLATES, load_action_schema
 
 BASE = Path(__file__).resolve().parent
 ACTION_SCHEMA = load_action_schema()
 ACTION_VALIDATOR = Draft202012Validator(ACTION_SCHEMA)
-ACTION_TEMPLATES = [
-    {"name": "select_role", "arguments": {"member": "um integrante visível", "role": "uma função do conjunto permitido"}},
-    {"name": "set_step_order", "arguments": {"steps": ["LOCATE_RESOURCE", "ACTIVATE_CHECKPOINT", "TRANSPORT_RESOURCE"]}},
-    {"name": "open_checklist", "arguments": {}},
-    {"name": "open_help", "arguments": {"topic": "mission_requirements | role_constraints | task_dependencies"}},
-    {"name": "refresh_feed", "arguments": {}},
-    {"name": "send_ping", "arguments": {"code": "PLAN_UPDATED | NEXT_STEP_ACTIVATE_CHECKPOINT"}},
-    {"name": "review_plan", "arguments": {}},
-    {"name": "confirm_plan", "arguments": {}},
-]
 
 
 class MockPolicy:
@@ -40,11 +31,31 @@ class MockPolicy:
         task_id = observation["task_id"]
         available_names = {item.get("name") for item in observation["available_actions"]}
 
-        if task_id == "T2" and state.get("actions_proposed", 0) >= 1:
+        if task_id in {"T2", "T4"} and "send_ping" in available_names:
+            if "NEXT_STEP_ACTIVATE_CHECKPOINT" not in state.get("pings", []):
+                return {"name": "send_ping", "arguments": {"code": "NEXT_STEP_ACTIVATE_CHECKPOINT"}}
+
+        if task_id in {"T2", "T4"} and state.get("actions_proposed", 0) >= 1:
             if state.get("feed_revision", 0) == 0:
                 return {"name": "refresh_feed", "arguments": {}}
             if "send_ping" in available_names and "NEXT_STEP_ACTIVATE_CHECKPOINT" not in state.get("pings", []):
                 return {"name": "send_ping", "arguments": {"code": "NEXT_STEP_ACTIVATE_CHECKPOINT"}}
+        if task_id == "T3" and "remove_assignment" in available_names:
+            if state.get("feed_revision", 0) == 0 and "refresh_feed" in available_names:
+                return {"name": "refresh_feed", "arguments": {}}
+            return {"name": "remove_assignment", "arguments": {"member": "member_C"}}
+        if (
+            task_id == "T4"
+            and "set_step_order" in available_names
+            and state.get("step_order")
+            != ["LOCATE_RESOURCE", "ACTIVATE_CHECKPOINT", "TRANSPORT_RESOURCE"]
+        ):
+            return {
+                "name": "set_step_order",
+                "arguments": {
+                    "steps": ["LOCATE_RESOURCE", "ACTIVATE_CHECKPOINT", "TRANSPORT_RESOURCE"]
+                },
+            }
 
         assignments = state.get("assignments", {})
         members = state.get("members", {})
@@ -76,7 +87,7 @@ class MockPolicy:
             if candidates:
                 return {"name": "select_role", "arguments": {"member": candidates[0], "role": role}}
 
-        if task_id == "T2" and "send_ping" in available_names and "NEXT_STEP_ACTIVATE_CHECKPOINT" not in state.get("pings", []):
+        if task_id in {"T2", "T4"} and "send_ping" in available_names and "NEXT_STEP_ACTIVATE_CHECKPOINT" not in state.get("pings", []):
             return {"name": "send_ping", "arguments": {"code": "NEXT_STEP_ACTIVATE_CHECKPOINT"}}
         if not state.get("reviewed"):
             return {"name": "review_plan", "arguments": {}}
@@ -90,9 +101,12 @@ def _parse_enabled(values: str | None) -> list[str]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="UXAgent protótipo de calibração T1/T2")
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    parser = argparse.ArgumentParser(description="UXAgent protótipo de calibração e validação independente")
     parser.add_argument("--mock", action="store_true", help="Executa sem API/custo para testar o ciclo")
-    parser.add_argument("--task", choices=("T1", "T2"), default="T1", help="Tarefa de calibração (T1 ou T2)")
+    parser.add_argument("--task", choices=("T1", "T2", "T3", "T4"), default="T1", help="Tarefa sintética (T1/T2 calibração; T3/T4 validação reservada)")
     parser.add_argument("--max-steps", type=int, default=20, help="Limite de ações propostas (padrão: 20)")
     parser.add_argument("--config", default=str(BASE / "uxagent_mechanisms.json"), help="Arquivo JSON com parâmetros R1–R4")
     parser.add_argument("--enable", help="Ativar mecanismos específicos, separados por vírgula: R1,R2,R3,R4")
@@ -115,7 +129,9 @@ def main() -> int:
     log_path = log_root / f"{session_id}.jsonl"
     logger = EventLogger(
         log_path, BASE / "uxagent_event.schema.json", model,
-        task_id=args.task, condition="calibration", config_version=config.log_version,
+        task_id=args.task,
+        condition="validation" if args.task in {"T3", "T4"} else "calibration",
+        config_version=config.log_version,
     )
 
     try:
@@ -124,7 +140,8 @@ def main() -> int:
         print(f"ERRO: {exc}", file=sys.stderr)
         return 2
 
-    env = T1Environment(session_id=session_id) if args.task == "T1" else T2Environment(session_id=session_id)
+    environments = {"T1": T1Environment, "T2": T2Environment, "T3": T3Environment, "T4": T4Environment}
+    env = environments[args.task](session_id=session_id)
     controller = T1Controller(env, config)
     enabled = [name for name, state in config.enabled.items() if state]
     print(f"UXAgent — {args.task}: {env.task_objective}")
@@ -143,7 +160,7 @@ def main() -> int:
         note="Tarefa sintética de calibração iniciada. Configuração versionada: " + json.dumps(config.to_dict(), sort_keys=True),
     )
 
-    def trigger_t2_update_after_first_proposal(step_number: int, obs_id: str) -> None:
+    def trigger_feed_update_after_first_proposal(step_number: int, obs_id: str) -> None:
         """Evento externo predefinido ocorre após a primeira tentativa, mesmo se o schema falhar."""
         if isinstance(env, T2Environment) and step_number == 1 and not env.update_applied:
             update_pre = env.snapshot()
@@ -170,7 +187,10 @@ def main() -> int:
             event="observation_emitted", actor="controller", session_id=session_id, step=step,
             state_pre=before, state_post=visible_state, observation_id=observation_id,
             note="Estado visível entregue à política; metadados para auditoria: " + json.dumps(mechanism_metadata, ensure_ascii=False, sort_keys=True),
-            opportunity_id=("R2-communication-opportunity" if args.task == "T2" and env.update_applied else None),
+            opportunity_id=(
+                "R2-communication-opportunity"
+                if args.task in {"T2", "T4"} and env.update_applied else None
+            ),
         )
 
         try:
@@ -188,7 +208,7 @@ def main() -> int:
                 env.proposal_count += 1
                 print(f"Passo {step}: ação rejeitada pelo schema local: {msg}")
                 env.last_feedback = f"Ação rejeitada pelo schema local: {msg}"
-                trigger_t2_update_after_first_proposal(step, observation_id)
+                trigger_feed_update_after_first_proposal(step, observation_id)
                 continue
 
             logger.log(
@@ -236,7 +256,7 @@ def main() -> int:
                 print(f"Passo {step}: {action['name']} REJEITADA — {result.reason}")
 
             # Evento externo predefinido da T2: a política só verá a versão observada na próxima chamada.
-            trigger_t2_update_after_first_proposal(step, observation_id)
+            trigger_feed_update_after_first_proposal(step, observation_id)
 
             if result.completed:
                 success, reason = env.externally_evaluate()
