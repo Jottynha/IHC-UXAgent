@@ -3,7 +3,7 @@
   "frozen_at": "2026-11-05",
   "status": "visual-polish-and-independent-tasks-frozen",
   "scope": "T1/T2 synthetic calibration, independent T3/T4 workflows, and polished low-fidelity instrumented prototype",
-  "supersedes": "freeze_manifest_v3.json",
+  "supersedes": "previous technical freezes",
   "not_approved_for": [
     "human validation before institutional review",
     "using T3/T4 results to calibrate T1/T2",

@@ -12,9 +12,10 @@ não deve ser usado para inferir comportamento real.
 - Ações fechadas e validadas por JSON Schema.
 - Avaliador externo baseado no estado verdadeiro.
 - Logs JSONL validados pelo schema de eventos.
-- Fachada `UXAgentSession` pronta para uma futura interface web/desktop.
+- Fachada `UXAgentSession` usada pela interface web e disponível para futura
+  integração desktop.
 - T3 e T4 implementadas em versão independente para validação reservada.
-- Interface web local de baixa fidelidade implementada; design visual final ainda não implementado.
+- Interface web local de baixa fidelidade implementada com refinamento visual.
 - Base técnica congelada para reprodução em [`docs/freeze_manifest_v4.json`](docs/freeze_manifest_v4.json).
 
 ## Estrutura
@@ -28,8 +29,7 @@ não deve ser usado para inferir comportamento real.
 | `gemini_client.py` | Adaptador opcional para Gemini |
 | `event_logger.py` | Eventos JSONL validados |
 | `metrics.py` | Resumos auditáveis de sessões |
-| `resumir_logs_uxagent.py` | Resumo seguro de logs |
-| `uxagent_cli.py` | Executor CLI de T1/T2 |
+| `uxagent_cli.py` | Executor CLI de T1/T2/T3/T4 |
 | `uxagent_action.schema.json` | Contrato de ações |
 | `uxagent_event.schema.json` | Contrato de eventos |
 | `uxagent_ui.schema.json` | Contrato do modelo entregue à interface |
@@ -128,7 +128,7 @@ O modo mock testa integração e oráculos, não qualidade do modelo. Logs sint�
 não substituem participantes, métricas humanas ou validação externa.
 
 Os PDFs de requisitos estão em [`docs/`](docs/). T3/T4 estão descritas em
-[`Tarefas_validacao_reservadas_v1.md`](Tarefas_validacao_reservadas_v1.md) e
+[`Tarefas_validacao_reservadas_v2.md`](Tarefas_validacao_reservadas_v2.md) e
 implementadas sem usar seus resultados para calibrar T1/T2.
 A matriz de rastreabilidade está em
 [`docs/requirements_traceability.md`](docs/requirements_traceability.md).

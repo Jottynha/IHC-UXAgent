@@ -3,7 +3,7 @@
 **Data:** 2026-11-05  
 **Escopo:** `EnunciadoUXAgent.pdf`, `HTSAgent-A2.pdf`,
 `Modelagem__IHC_.pdf`, `UXAgentDesign-A3.pdf` e
-`Tarefas_validacao_reservadas_v1.md`.
+`Tarefas_validacao_reservadas_v2.md`.
 
 ## Resumo executivo
 
@@ -13,8 +13,8 @@ baixa fidelidade. A separação entre ambiente, observação, política, control
 instrumentação e avaliador externo está implementada.
 
 Ele **ainda não está aprovado como entrega final de Design UXAgent**. Os
-artefatos formais de IHC agora estão documentados, mas ainda precisam de
-auditoria contra a interface concreta e de piloto técnico.
+artefatos formais de IHC estão documentados e foram auditados contra o
+protótipo; validação humana e aprovação institucional continuam pendentes.
 
 ## Conformidade por requisito
 
@@ -26,7 +26,7 @@ auditoria contra a interface concreta e de piloto técnico.
 | T1/T2 de calibração | Atendido | `environment.py`, `tests/` | Há execução mock e integração real Gemini testada. |
 | Instrumentação e eventos | Atendido | `event_logger.py`, `uxagent_event.schema.json` | Eventos JSONL são validados na escrita. |
 | Avaliação independente | Atendido | `environment.py`, `uxagent_session.py` | O resultado não é decidido pelo Gemini. |
-| Interface instrumentada | Parcialmente atendido | `uxagent_web.py`, `uxagent_session.py` | Protótipo web funcional; ainda não é o design final. |
+| Interface instrumentada | Atendido como protótipo | `uxagent_web.py`, `uxagent_session.py` | Protótipo web funcional com refinamento visual; ainda não é produto final. |
 | Quatro tarefas, duas reservadas | Atendido tecnicamente | `environment.py`, `tests/test_reserved_tasks.py` | T1/T2 calibram; T3/T4 executam em versão independente e continuam reservadas. |
 | HTA | Atendido como artefato | `docs/ihc_design_artifacts_v1.md` | HTA refinada registrada sem entregar o modelo ao agente. |
 | CTT | Atendido como artefato | `docs/ihc_design_artifacts_v1.md` | CTT textual versionado. |
@@ -34,7 +34,7 @@ auditoria contra a interface concreta e de piloto técnico.
 | MoLIC e rupturas | Atendido como artefato | `docs/ihc_design_artifacts_v1.md` | Cenas, falas, transições e recuperações registradas. |
 | Metamensagem e signos | Atendido como artefato | `docs/ihc_design_artifacts_v1.md` | Canais e fronteira de informação explicitados. |
 | Protocolo humano/ética | Base documentada | `docs/human_validation_protocol_v1.md` | Plano e limites registrados; aprovação institucional ainda não existe. |
-| Validação independente T3/T4 | Reservado | `Tarefas_validacao_reservadas_v1.md` | Não usar para calibrar prompts, mecanismos ou interface. |
+| Validação independente T3/T4 | Reservado | `Tarefas_validacao_reservadas_v2.md` | Não usar para calibrar prompts, mecanismos ou interface. |
 
 ## Decisões de congelamento
 
