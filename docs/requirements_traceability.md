@@ -47,7 +47,7 @@ medem qualidade humana, usabilidade ou desempenho geral do modelo.
 - T3/T4 têm implementação independente e continuam reservadas para validação;
   seus resultados não calibram T1/T2.
 - Interface, prompt, configuração, schemas e modelo estão congelados para a
-  base técnica em [`freeze_manifest_v6.json`](freeze_manifest_v6.json).
+  base técnica em [`freeze_manifest_v7.json`](freeze_manifest_v7.json).
 - O congelamento técnico não autoriza estudo humano nem transforma resultados
   sintéticos em evidência empírica.
 - O protocolo, a amostra operacional, as tolerâncias e a ética estão
